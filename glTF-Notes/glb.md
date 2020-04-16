@@ -54,7 +54,7 @@ glb在文件头后，有两个数据块，即`Chunk 0`代表glTF的JSON文本，
 - chunkType（uint32类型，占4byte）
 - chunkData（ubyte[]类型）
 
-chunkLength代表的是chunkData的长度。chunkType指示当前数据块是什么数据，chunkData是当前数据块的真正数据。
+    chunkLength代表的是chunkData的长度。chunkType指示当前数据块是什么数据，chunkData是当前数据块的真正数据。
 
 chunkType的值只能是以下两种：
 

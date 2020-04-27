@@ -1,4 +1,4 @@
-tileset.json
+废话不多说，跳过开头直接开始。
 
 # 扩展名和MIME类型
 
@@ -32,7 +32,7 @@ tileset.json
 
 边界范围使用EPSG：4979这个地理坐标系来限定。
 
-# EPSG4979和4978
+## EPSG4979和4978
 
 来看看他们的OGC WKT
 
@@ -76,93 +76,456 @@ GEOGCS["WGS 84",
 
 ## ①瓦片
 
-
+瓦片其实是一个数组，由用于确定是否渲染该瓦片的元数据，对瓦片数据内容的引用，以及子瓦片组成。
 
 ### a.几何误差
 
+瓦片构造为HLOD的树结构，以便在运行时，客户端判断瓦片是否足够精细来决定进行渲染，以及是否应使用更高层级的瓦片来替代渲染以提高显示效果。有一种实现利用了最大*屏幕空间误差（SSE）*，该误差利用像素来量算。
 
+瓦片的几何误差定义了该瓦片被选择性。其值是一个以米为单位的非负数，它指定了瓦片的几何图形的简化程度。root 瓦片的几何误差最大，所以其几何图形最简。
 
-### b.细化
+规定每个瓦片的几何误差比子瓦片的几何误差大，叶子瓦片的几何误差为0或接近0。
 
+在代码实现渲染时，几何误差与其他指标（例如，瓦片到相机的距离，屏幕大小，分辨率）共同起作用，以计算屏幕空间误差。如果屏幕空间误差超过了最大值，瓦片将被干掉，其子瓦片将被渲染。
 
+几何误差是根据度量标准制定的，例如点密度，以米为单位的瓦片大小或该瓦片特有的其他因素。通常，几何误差大则这个瓦片更有可能在渲染时被干掉，其子瓦片才能更快被渲染。
+
+### b.细化（Refinement）
+
+细化属性，决定了当前是子瓦片的分辨率时，父级瓦片的显示还是隐藏。
+
+细化的属性有两种，为替换（"REPLACE"）和附加（"ADD"）。如果瓦片的细化用的是"REPLACE"，则将渲染子瓦片代替父瓦片，即不再渲染父瓦片。
+
+瓦片数据集中所有的瓦片可以只使用"REPLACE"和"ADD"的一种，也可以任意组合。
+
+瓦片数据集的root瓦片的Refinement是必须指定的，对于其他的瓦片是可选的。如果子瓦片的Refinement没有指定，则继承父级瓦片的属性值。
 
 #### 替换
 
+如果一个瓦片使用"替换（REPLACE）"作为细化规则，则会使用其子瓦片来替代它来进行渲染。
 
+![image-20200417102123482](./attachments/image-20200417102123482.png)
 
 #### 附加
 
+与“替换”不同，如果瓦片的细化规则使用了"附加（ADD）"，则细化时会同时渲染自身及其子代。
 
+![image-20200417103038259](./attachments/image-20200417103038259.png)
 
-### c. 边界框（Bounding Volumes）
+### c. 边界框（boundingVolume）
 
+边界框定义了某个瓦片的空间范围。
 
+为了使得不同数据能够在空间上连续排布，边界框有三种：定向边界盒子（Box），边界球（Sphere）和范围（Region）。
+
+![image-20200417110737519](D:\MyCodes\my-dev-notes\3dtiles-Notes\attachments\image-20200417110737519.png)
 
 #### 范围（Region）
 
+`boundingVolume.region`属性是一个由六个数字组成的数组，这些数字用纬度，经度和高度坐标定义了地理区域，其坐标顺序为$[west，south，east，north，minHeight，maxHeight]$。
 
+其中，东西南北这4个值EPSG 4979有定义，以弧度表示。
+
+高度相对于WGS84椭球表面定义，以米为单位。
+
+```json
+"boundingVolume": {
+  "region": [
+    -1.3197004795898053,
+    0.6988582109,
+    -1.3196595204101946,
+    0.6988897891,
+    0,
+    20
+  ]
+}
+```
 
 #### 盒子（box）
 
+`boundingVolume.box`属性是一个由12个数字组成的数组，在右手空间直角坐标系中定义了一个长方体。
 
+1~3号数字定义框中心坐标。
+
+4\~6号数字定义x轴方向和半长；7\~9号数字定义y轴方向和半长；10\~12号数字定义z轴方向和半长。
+
+例如，例子里的4~6号数字，[100, 0, 0]代表x方向的长度为2*100（100是半长）。
+
+```JSON
+"boundingVolume": {
+  "box": [
+    0,   0,   10, // 中心坐标 [0, 0, 10]
+    100, 0,   0,
+    0,   100, 0,
+    0,   0,   10
+  ]
+}
+```
 
 #### 球体（Sphere）
 
+`boundingVolume.sphere`属性是由四个数字组成的数组，这定义了一个球。分别是中心坐标、半径。
 
+```JSON
+"boundingVolume": {
+  "sphere": [
+    0,
+    0,
+    10,
+    141.4214 // 米为单位
+  ]
+}
+```
 
 ### d. Viewer request volume
 
+瓦片的`viewerRequestVolume`可以用于组合不同的瓦片数据，甚至可以组合外部瓦片数据集。
 
+下面的例子，有两个瓦片，一个是b3dm类型的，一个是pnts类型的。pnts类型的边界框是球体，半径是1.25，但是它具有一个`viewerRequestVolume`属性，是一个半径为15的更大的球体，当`geometricError`是0时，当摄像机位于这个由`viewerRequestVolume`定义的更大的球体内时，pnts瓦片总会被渲染。
+
+```JSON
+{
+  "children": [{
+    "transform": [
+      4.843178171884396,   1.2424271388626869, 0,                  0,
+      -0.7993325488216595,  3.1159251367235608, 3.8278032889280675, 0,
+      0.9511533376784163, -3.7077466670407433, 3.2168186118075526, 0,
+      1215001.7612985559, -4736269.697480114,  4081650.708604793,  1
+    ],
+    "boundingVolume": {
+      "box": [
+        0,     0,    6.701,
+        3.738, 0,    0,
+        0,     3.72, 0,
+        0,     0,    13.402
+      ]
+    },
+    "geometricError": 32,
+    "content": {
+      "uri": "building.b3dm"
+    }
+  }, {
+    "transform": [
+      0.968635634376879,    0.24848542777253732, 0,                  0,
+      -0.15986650990768783,  0.6231850279035362,  0.7655606573007809, 0,
+      0.19023066741520941, -0.7415493329385225,  0.6433637229384295, 0,
+      1215002.0371330238,  -4736270.772726648,   4081651.6414821907, 1
+    ],
+    "viewerRequestVolume": {
+      "sphere": [0, 0, 0, 15]
+    },
+    "boundingVolume": {
+      "sphere": [0, 0, 0, 1.25]
+    },
+    "geometricError": 0,
+    "content": {
+      "uri": "points.pnts"
+    }
+  }]
+}
+```
 
 ### e. 转换（Transforms）
 
 #### 瓦片转换
 
+为了支持局部坐标系，每个图块都具有可选的转换（`transform`）属性。
 
+`transform`属性是一个4x4仿射变换矩阵，按列优先顺序存储（即1~4号数字是矩阵的第一列）。该矩阵表达了当前瓦片的所有坐标经过此矩阵仿射变换后，可从瓦片的局部坐标转换到父瓦片的坐标。
+
+`transform`属性适用于：
+
+- `tile.content`
+    - 每个要素的位置
+    - 每个要素的法线由`transform`矩阵左上角的3x3矩阵进行转换，以适应合适的比例
+    - `content.boundingVolume`属性。但是`content.boundingVolume.region`如果定义了，转换就无效，因为区域（region）是定义在EPSG:4979上的。
+- `tile.boundingVolume`，除非`tileboundingVolume.region`定义了。
+- `tile.viewerRequestVolume`，除非`tile.viewerRequestVolume.region`定义了。
+
+`transform`属性不适用于geometryError，也就是说，`transform`定义的比例变换，并不会影响几何误差，几何误差始终以米为单位。
+
+如果`transform`没有定义，则默认使用单位矩阵：
+
+```JSON
+[
+1.0, 0.0, 0.0, 0.0,
+0.0, 1.0, 0.0, 0.0,
+0.0, 0.0, 1.0, 0.0,
+0.0, 0.0, 0.0, 1.0
+]
+```
+
+从每个瓦片的局部坐标到瓦片数据集的全局坐标的变换，是通过链式求矩阵的点积实现的。即从子瓦片到最顶层瓦片的所有转换矩阵的乘积。
 
 #### glTF转换
 
-
+b3dm和i3dm瓦片文件都内嵌了glTF，它自己有自己的node结构，并使用y向上坐标系。理解glTF的转换后，特定瓦片的`tile.transform`属性的转换就不难了。
 
 ##### glTF 节点树状结构
 
+看glTF文档即可。
 
+##### 交换y朝上至z朝上
 
-##### y朝上至z朝上
+因为glTF是y轴朝上，3dtiles是z轴朝上，必须将glTF的坐标进行转换。只需把glTF模型绕x轴旋转90度即可。对应的矩阵变换是：
+$$
+M=\left[ \begin{matrix} 
+1&0&0&0\\
+0&0&1&0\\
+0&-1&0&0\\
+0&0&0&1
+\end{matrix} \right]
+$$
+使用JSON数组即为：
 
+```
+[
+    1.0, 0.0,  0.0, 0.0,
+    0.0, 0.0, -1.0, 0.0,
+    0.0, 1.0,  0.0, 0.0,
+    0.0, 0.0,  0.0, 1.0
+]
+```
 
+广义地，从gltf模型到3dtiles模型的坐标转换，经历了以下步骤：
+
+1. glTF节点层级之间的转换
+2. glTF的y轴转z轴，即绕x轴旋转90度。
+3. 瓦片内部的转换
+    - b3dm的要素表可能定义了`RTC_CENTER`属性，则需要用这个相对中心坐标进行转换顶点坐标值。
+    - i3dm的要素表定义了每个instance的坐标、法线、缩放比例，这3个属性应用于每个instance的4x4仿射变换矩阵。
+4. 瓦片对于上一级瓦片的转换
+
+> 程序实现注意：
+>
+> 当使用本质上为z-up的源数据（例如WGS 84坐标或本地z-up坐标系中的数据）时，常见的工作流程是：
 
 #### 例子
 
+![image-20200417144812936](./attachments/image-20200417144812936.png)
 
+每个瓦片的转换矩阵是：
+
+- T0：$[T0]$
+- T1：$[T0][T1]$
+- T2：$[T0][T2]$
+- T3：$[T0][T1][T3]$
+- T4：$[T0][T1][T4]$
+
+在瓦片进行转换前，瓦片文件中的位置、法线或许有自己的转换信息。例如：
+
+- b3dm和i3dm瓦片均内嵌glTF，glTF自己定义了节点层级关系和坐标系。`tile.transform`得在glTF这些转换结束后才能进行转换。
+- i3dm的要素表定义了每个instance的位置、法线和缩放比例，这3个属性会创建一个4x4的仿射变换矩阵，等这个仿射变换完成后，才能进行`tile.transform`转换。
+- 被数据压缩的属性，例如i3dm和pnts瓦片中要素表中的`POSITION_QUANTIZED`属性，以及pnts的`NORMAL_OCT16P`属性，必须先解压缩再进行转换计算。
+
+因此，以上示例的完整转换计算过程为：
+
+- T0: `[T0]`
+- T1: `[T0][T1]`
+- T2: `[T0][T2][pnts内部转换，RTC_CENTER(如果定义了)]`
+- T3: `[T0][T1][T3][b3dm内部转换, 包括RTC_CENTER(如果定义了), 坐标系转换, glTF节点层级转换]`
+- T4: `[T0][T1][T4][i3dm内部转换, 包括每个instance的转换, 坐标系转换, glTF节点层级转换]`
 
 #### 代码实现案例（并不是规范内容）
 
+以下JavaScript代码显示了如何使用Cesium的Matrix4和Matrix3类型进行计算。
 
+```JS
+// tileset：Cesium3DTileset类型
+function computeTransforms(tileset) {
+    const tile = tileset.root;
+    const transformToRoot = defined(t.transform) ? Matrix4.fromArray(t.transform) : Matrix4.IDENTITY;
+	// 如果有定义transform就用transform创建一个Matrix4，否则用单位矩阵
+    computeTransform(tile, transformToRoot);
+}
+
+function computeTransform(tile, transformToRoot) {
+    // 将每个瓦片的位置、边界框转换到root瓦片的坐标
+
+    // 先转置
+    const inverseTransform = Matrix4.inverse(transformToRoot, new Matrix4());
+	// 单位化
+    const normalTransform = Matrix4.getRotation(inverseTransform, new Matrix3());
+    normalTransform = Matrix3.transpose(normalTransform, normalTransform);
+
+    const children = tile.children;
+    const length = children.length;
+    for (var i = 0; i < length; ++i) {
+        let child = children[i];
+        let childToRoot = defined(child.transform) ? Matrix4.fromArray(child.transform) : Matrix4.clone(Matrix4.IDENTITY);
+        childToRoot = Matrix4.multiplyTransformation(transformToRoot, childToRoot, childToRoot);
+        // 套娃
+        computeTransform(child, childToRoot);
+    }
+}
+```
 
 ### f. 瓦片的独立JSON文件
 
+瓦片如果是引用一个JSON文件，那么这个表示某某瓦片的JSON文件应该由以下属性构成：
 
+![image-20200417150848914](./attachments\image-20200417150848914.png)
+
+以下示例显示了一个非叶子瓦片的JSON。
+
+```JSON
+{
+  "boundingVolume": {
+    "region": [
+      -1.2419052957251926,
+      0.7395016240301894,
+      -1.2415404171917719,
+      0.7396563300150859,
+      0,
+      20.4
+    ]
+  },
+  "geometricError": 43.88464075650763,
+  "refine" : "ADD",
+  "content": {
+    "boundingVolume": {
+      "region": [
+        -1.2418882438584018,
+        0.7395016240301894,
+        -1.2415422846940714,
+        0.7396461198389616,
+        0,
+        19.4
+      ]
+    },
+    "uri": "2/0/0.b3dm"
+  },
+  "children": [...]
+}
+```
+
+很多属性上文都提过了，特别提几个。
+
+`content.boundingVolume`和顶级的`boundingVolume`很像，但是不同的是，`content.boundingVolume`相当于HTML中的`padding`，与数据内容完全紧密贴合的一个范围框，而外部的`boundingVolume`相当于HTML中的`margin`，保证与兄弟瓦片在空间上连续。
+
+`boundingVolume`支持视锥剔除，如果不在视锥范围内，那就不渲染。
+
+如果没有定义`content.boundingVolume`，则顶级的`boundingVolume`依旧支持视锥剔除。
+
+下面的截图显示了某个数据root 瓦片的边界框。
+
+![image-20200417152217931](./attachments\image-20200417152217931.png)
+
+红色线框表示`boundingVolume`，蓝色线框表示`content.boundingVolume`。
+
+关于某个瓦片的JSON文件完整定义，见[tile.schema.json](https://github.com/CesiumGS/3d-tiles/blob/master/specification/schema/tile.schema.json)
 
 ## ② 瓦片数据集的JSON文件
 
+3D Tiles使用一个主tileset.json文件作为瓦片数据集的入口点。
 
+以下是一个略有精简的tileset.json文件
+
+```JSON
+{
+  "asset" : {
+    "version": "1.0",
+    "tilesetVersion": "e575c6f1-a45b-420a-b172-6449fa6e0a59",
+  },
+  "properties": {
+    "Height": {
+      "minimum": 1,
+      "maximum": 241.6
+    }
+  },
+  "geometricError": 494.50961650991815,
+  "root": {
+    "boundingVolume": {
+      "region": [
+        -0.0005682966577418737,
+        0.8987233516605286,
+        0.00011646582098558159,
+        0.8990603398325034,
+        0,
+        241.6
+      ]
+    },
+    "geometricError": 268.37878244706053,
+    "refine": "ADD",
+    "content": {
+      "uri": "0/0/0.b3dm",
+      "boundingVolume": {
+        "region": [
+          -0.0004001690908972599,
+          0.8988700116775743,
+          0.00010096729722787196,
+          0.8989625664878067,
+          0,
+          241.6
+        ]
+      }
+    },
+    "children": [..]
+  }
+}
+```
+
+tileset.json具有四个顶级属性：asset，properties，geometricError和root。
+
+`asset`是一个包含有关整个瓦片数据集的元数据的对象。
+
+asset.version属性是一个字符串，用于定义3D Tiles版本，该版本指定tileet的JSON模式和基本的tile格式集。
+
+asset.tilesetVersion属性是一个可选字符串，用于定义特定于应用程序的瓦片数据集版本，例如，用于更新现有瓦片数据集的时间。
+
+`properties`是一个对象，包含每个要素的属性的描述信息。properties中每个对象的名称与每个要素的属性的名称匹配，并且带有其最小和最大值，这对于符号化很有用。
+
+`geometricError`是一个非负数，它定义了误差（以米为单位）。它用于确定是否渲染瓦片。在运行时，几何误差用于计算屏幕空间误差（SSE），即以像素为单位的误差。如果SSE不大于给定的最小值，则不应该渲染瓦片数据集，包括它每一个瓦片。
+
+`root`是一个对象，该对象使用上一节中介绍的图块JSON定义根图块。`root.geometricError`与瓦片数据集的顶级`geometricError`不同。顶级的`geometricError`在程序运行时用于确定tileset的root瓦片呈现的SSE；`root.geometricError`在程序运行时用于确定呈现根图块的子瓦片的SSE。
 
 ### a. 外部的瓦片数据集
 
+要创建一棵树，瓦片的`content.uri`可以指向外部瓦片数据集（另一个瓦片JSON文件的uri）。例如，这可以将每个城市存储在一个3dtileset中，然后把它们集中到一个全局的瓦片数据集中。
 
+![image-20200417153528832](./attachments\image-20200417153528832.png)
+
+当瓦片指向外部3dtileset时，这个瓦片：
+
+- 不能有children属性；tile.children必须未定义或为空数组。
+- 不能搞自我引用，即uri不能引用自己，或者其引用的外部瓦片数据集又引用自己。
+- 将同时通过瓦片的transform和root瓦片的变换进行变换。例如，在以下引用外部瓦片的瓦片中，对于T3瓦片，转换矩阵为$[T0] [T1] [T2] [T3]$。
+
+![image-20200417153923939](./attachments\image-20200417153923939.png)
 
 ### b. 边界框的空间连续性
 
+如上所述，瓦片数据集的树状结构具有空间连贯性。每个瓦片都有一个完全包围其数据的边界框，子瓦片的**内容**完全在父瓦片的边界框内。
 
+但是，这并不意味着子瓦片的**边界框**完全在其父瓦片的边界框之内。例如：
+
+![image-20200417154119467](./attachments\image-20200417154119467.png)
+
+地形瓦片的球状边界框。
+
+![image-20200417154154035](./attachments\image-20200417154154035.png)
+
+四个子瓦片的边界球。
+
+子瓦片的**数据内容**完全在父瓦片的边界框之内，但是子瓦片的**边界框**并不紧密结合，因为球体肯定会存在间隙。
 
 ### c. 空间数据结构
 
+3DTiles使用了HLOD的概念，呈现空间数据很棒。
 
+瓦片数据集对瓦片的组织是树结构，树有很多种。
+
+渲染引擎是通用的，与树的结构无关，对于不同的瓦片格式和细化规则的组合可以达到瓦片数据集的最佳效果。
+
+下面包括对3D Tile如何表示各种空间数据结构的简要说明。
 
 #### c1. 四叉树
 
+当每个瓦片具有四个统一细分的子级（例如，使用中心纬度和经度）时，就会创建四叉树，类似于典型的2D地理空间切片方案。空的子瓦片可以省略。
 
+![image-20200417154751832](./attachments\image-20200417154751832.png)
+
+3D Tiles支持四叉树变体，例如非平衡切分和紧密的边界体积（例如，与边界相反，父块的全部25％都是有限的，这对于稀疏数据集是浪费的）。
 
 #### c2. k-d 树
 

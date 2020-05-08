@@ -29,3 +29,7 @@ https://github.com/kohsuke/winsw/releases，下载合适的exe即可
 之后即可在任务管理器或服务列表启动它了。
 
 ![image-20200507204243166](attachments/image-20200507204243166.png)
+
+# 重启失败
+
+端口被占用或conf文件有问题

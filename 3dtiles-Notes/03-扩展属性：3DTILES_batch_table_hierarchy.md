@@ -368,19 +368,75 @@ block_district : "central"
 
 ## 样式化
 
+此扩展支持style语言中使用下列内置函数，用于要素的查询：
 
+- [getExtratClassName](#getExtractClassName)
+- [isExactClass](#isExactClass)
+- [isClass](#isClass)
 
 ### getExactClassName
 
+```
+getExactClassName() : String
+```
 
+返回要素的名称（字符串），或者返回undefined（如果找不到）。
+
+如下例子，下面的样式语言会把门把手渲染成黄色，把所有门渲染成绿色，把其他的要素渲染成灰色。
+
+```JSON
+{
+    "defines" : {
+        "suffix" : "regExp('door(.*)').exec(getExactClassName())" // 正则匹配后缀？
+    },
+    "color" : {
+        "conditions" : [
+            ["${suffix} === 'knob'", "color('yellow')"],
+            ["${suffix} === ''", "color('green')"],
+            ["${suffix} === null", "color('gray')"],
+            ["true", "color('blue'"]
+        ]
+    }
+}
+```
 
 ### isExactClass
 
+```
+isExactClass(name : String) : Boolean
+```
 
+传入要素名称（字符串），如果和当前要素的名称一致则返回true，否则返回false。
+
+举例说明，下例样式语言会把所有门模型渲染成红色，但是门的子级模型全部渲染成白色：
+
+```JSON
+"color" : {
+    "conditions" : [
+        ["isExactClass('door')", "color('red')"],
+        ["true", "color('white')"]
+    ]
+}
+```
 
 ### isClass
 
+```
+isClass(name : String) : Boolean
+```
 
+如果要素类的名称与传入的名称相同，或者父级要素或者更高级别的父级要素的名称与传入的相同，返回true，否则返回false。
+
+例如，下面的样式语言将为所有门和门把手着色。
+
+```json
+"color" : {
+    "conditions" : [
+        ["isClass('door')", "color('blue')"],
+        ["true", "color('white')"]
+    ]
+}
+```
 
 ## 注意
 

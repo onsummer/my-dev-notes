@@ -120,7 +120,7 @@ GEOGCS["WGS 84",
 
 为了使得不同数据能够在空间上连续排布，边界框有三种：定向边界盒子（Box），边界球（Sphere）和范围（Region）。
 
-![image-20200417110737519](D:\MyCodes\my-dev-notes\3dtiles-Notes\attachments\image-20200417110737519.png)
+![image-20200417110737519](./attachments/image-20200417110737519.png)
 
 #### ①范围（Region）
 
@@ -304,7 +304,7 @@ $$
 
 #### 例子
 
-![image-20200417144812936](./attachments/image-20200417144812936.png)
+![image-20200417144812936](attachments/image-20200417144812936.png)
 
 每个瓦片的转换矩阵是：
 
@@ -366,7 +366,7 @@ function computeTransform(tile, transformToRoot) {
 
 瓦片如果是引用一个JSON文件，那么这个表示某某瓦片的JSON文件应该由以下属性构成：
 
-![image-20200417150848914](./attachments\image-20200417150848914.png)
+![image-20200417150848914](attachments/image-20200417150848914.png)
 
 以下示例显示了一个非叶子瓦片的JSON。
 
@@ -411,7 +411,7 @@ function computeTransform(tile, transformToRoot) {
 
 下面的截图显示了某个数据root 瓦片的边界框。
 
-![image-20200417152217931](./attachments\image-20200417152217931.png)
+![image-20200417152217931](attachments/image-20200417152217931.png)
 
 红色线框表示`boundingVolume`，蓝色线框表示`content.boundingVolume`。
 
@@ -485,7 +485,7 @@ asset.tilesetVersion属性是一个可选字符串，用于定义特定于应用
 
 要创建一棵树，瓦片的`content.uri`可以指向外部瓦片数据集（另一个瓦片JSON文件的uri）。例如，这可以将每个城市存储在一个3dtileset中，然后把它们集中到一个全局的瓦片数据集中。
 
-![image-20200417153528832](./attachments\image-20200417153528832.png)
+![image-20200417153528832](attachments/image-20200417153528832.png)
 
 当瓦片指向外部3dtileset时，这个瓦片：
 
@@ -493,7 +493,7 @@ asset.tilesetVersion属性是一个可选字符串，用于定义特定于应用
 - 不能搞自我引用，即uri不能引用自己，或者其引用的外部瓦片数据集又引用自己。
 - 将同时通过瓦片的transform和root瓦片的变换进行变换。例如，在以下引用外部瓦片的瓦片中，对于T3瓦片，转换矩阵为$[T0] [T1] [T2] [T3]$。
 
-![image-20200417153923939](./attachments\image-20200417153923939.png)
+![image-20200417153923939](attachments/image-20200417153923939.png)
 
 ### 6.2.2 边界框的空间连续性
 
@@ -501,11 +501,11 @@ asset.tilesetVersion属性是一个可选字符串，用于定义特定于应用
 
 但是，这并不意味着子瓦片的**边界框**完全在其父瓦片的边界框之内。例如：
 
-![image-20200417154119467](./attachments\image-20200417154119467.png)
+![image-20200417154119467](attachments/image-20200417154119467.png)
 
 地形瓦片的球状边界框。
 
-![image-20200417154154035](./attachments\image-20200417154154035.png)
+![image-20200417154154035](attachments/image-20200417154154035.png)
 
 四个子瓦片的边界球。
 
@@ -525,7 +525,7 @@ asset.tilesetVersion属性是一个可选字符串，用于定义特定于应用
 
 当每个瓦片具有四个统一细分的子级（例如，使用中心纬度和经度）时，就会创建四叉树，类似于典型的2D地理空间切片方案。空的子瓦片可以省略。
 
-![image-20200417154751832](./attachments\image-20200417154751832.png)
+![image-20200417154751832](attachments/image-20200417154751832.png)
 
 上图这个是传统四叉树。
 

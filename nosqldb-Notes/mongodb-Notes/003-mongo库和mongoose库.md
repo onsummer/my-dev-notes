@@ -4,10 +4,9 @@
 const mongoose = require('mongoose')
 
 await mongoose.connect('mongodb://localhost/my_database', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
+    useNewUrlParser: true,
+    useUnifiedTopology: true
 });
-
 ```
 
 更多用法见：https://github.com/Automattic/mongoose
@@ -98,14 +97,11 @@ conn.once('open', function () {
 ``` JS
 const fs = require('fs')
 const mongodb = require('mongodb')
-const assert = require('assert')
 
 const uri = `mongodb://localhost:27017`
 const dbName = `yes`
 
 mongodb.MongoClient.connect(uri, { useUnifiedTopology: true }, function(error, client) {
-    assert.ifError(error)
-
     const db = client.db(dbName)
     let bucket = new mongodb.GridFSBucket(db)
 
@@ -119,3 +115,43 @@ mongodb.MongoClient.connect(uri, { useUnifiedTopology: true }, function(error, c
 这里使用了mongodb.GridFSBucket类。
 
 `fs.createReadStream()`后，通过`pipe()`将文件流传递给``mongodb.GridFSBucket`的`openUploadStream()`来传递文件。
+
+# mongoose+gridfs
+
+``` JS
+const mongoose = require('mongoose')
+const GridFSBucket = require('mongodb').GridFSBucket
+const fs = require('fs')
+
+mongoose.connect('mongodb://127.0.0.1/yes', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+const conn = mongoose.connection
+
+conn.once('open', function () {
+    console.log('open!')
+    
+    const db = conn.db
+    let bucket = new GridFSBucket(db)
+    
+    fs.createReadStream(`C:/Users/C/Desktop/OpenResty-Best-Practices.pdf`)
+        .pipe(bucket.openUploadStream(`OpenResty-Best-Practices`))
+        .on('error', err => { assert.ifError(error) })
+        .on('finish', () => { console.log('done.'); process.exit(0); })
+})
+```
+
+和mongo官方库没什么不同，获取db变量传递给GridFSBucket变化了而已。
+
+mongo官方库的是MongoClient.db(dbName)来获取，而mongoose则是通过Connection.db来获取。
+
+文件的读写还都是得靠fs模块。
+
+> 注意：mongoose官方文档中对Connection的查阅中，并没有发现once方法，不止Connection，db变量也一样可以用once方法。经查阅，https://stackoverflow.com/questions/17575300/mongoose-the-function-once给出了答案。
+>
+> Connection类继承了EventEmitter类http://nodejs.org/api/events.html#events_class_events_eventemitter，所以可以直接使用once。
+>
+> ![image-20200513115207770](attachments/image-20200513115207770.png)
+>
+> ![image-20200513115127345](attachments/image-20200513115127345.png)

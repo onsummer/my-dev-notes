@@ -20,3 +20,10 @@ for file in cursor:
 conn.close()
 ```
 
+# 文档
+
+https://pymongo.readthedocs.io/en/stable/api/gridfs/index.html#module-gridfs
+
+# 示例代码
+
+https://pymongo.readthedocs.io/en/stable/examples/gridfs.html

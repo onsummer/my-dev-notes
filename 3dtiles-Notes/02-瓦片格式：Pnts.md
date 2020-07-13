@@ -26,12 +26,12 @@
     | ------------------ | ------------------------- | -------------------------------------- | ---------------------- |
     | POSITION           | float32 * 3               | 直角坐标的点                           | 是，除非下面的属性存在 |
     | POSITION_QUANTIZED | uint16 * 3                | 量化的直角坐标点                       | 是，除非上面的属性存在 |
-    | RGBA               | uint8 * 4                 | 四通道颜色                             |                        |
-    | RGB                | uint8 * 3                 | RGB颜色                                | /                      |
-    | RGB565             | uint16                    | 有损压缩颜色，红5绿6蓝5，即65536种颜色 | /                      |
-    | NORMAL             | float32 *3                | 法线                                   | /                      |
-    | NORMAL_OCT16P      | uint8 * 2                 | 点的法线，10进制单位向量，有16bit精度  | /                      |
-    | BATCH_ID           | uint8/uint16(默认)/uint32 | 从BatchTable种检索元数据的id           | /                      |
+    | RGBA               | uint8 * 4                 | 四通道颜色                             | 不必须                 |
+    | RGB                | uint8 * 3                 | RGB颜色                                | 不必须                 |
+    | RGB565             | uint16                    | 有损压缩颜色，红5绿6蓝5，即65536种颜色 | 不必须                 |
+    | NORMAL             | float32 *3                | 法线                                   | 不必须                 |
+    | NORMAL_OCT16P      | uint8 * 2                 | 点的法线，10进制单位向量，有16bit精度  | 不必须                 |
+    | BATCH_ID           | uint8/uint16(默认)/uint32 | 从BatchTable种检索元数据的id           | 不必须                 |
 
 - 全局属性
 

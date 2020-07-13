@@ -1,0 +1,1 @@
+在 `tileset.json` 文件中，有两个属性：`extensionsRequired` 和 `extensionsUsed`，

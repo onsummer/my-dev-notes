@@ -298,3 +298,7 @@ public enum JTokenType
 ```
 
 其实常用到的可能就那几个，例如Integer、Array、Object、None、Null、Undefined等。
+
+# 参考资料
+
+https://www.cnblogs.com/klsw/p/5904573.html

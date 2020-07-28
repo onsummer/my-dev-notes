@@ -1,6 +1,6 @@
 # 一、一个简单的3dTiles数据示例
 
-![image-20200617003657336](E:\Code\my-dev-notes\3dtiles-Notes\tutorial\attachments\image-20200617003657336.png)
+![image-20200617003657336](attachments\image-20200617003657336.png)
 
 上图是一份 3dTiles数据集在文件夹内的样子，层层打开可得以下特点：
 
@@ -113,7 +113,7 @@ kd树比较难理解，在此不作展开，这也是一种有趣的空间结构
 
 通常，瓦片对象会引用一个二进制的瓦片数据文件（也有例外，往下拉一点会说）：
 
-![image-20200628022039761](E:\Code\my-dev-notes\3dtiles-Notes\tutorial\attachments\image-20200628022039761.png)
+![image-20200628022039761](attachments\image-20200628022039761.png)
 
 在1.0 版本的规范中，瓦片所引用的二进制的瓦片数据文件，有四种类型：
 
@@ -139,7 +139,7 @@ kd树比较难理解，在此不作展开，这也是一种有趣的空间结构
 
 现在，我们关注一下，瓦片对象的职能，也就是，它记录了啥信息：
 
-![image-20200628022353080](E:\Code\my-dev-notes\3dtiles-Notes\tutorial\attachments\image-20200628022353080.png)
+![image-20200628022353080](attachments\image-20200628022353080.png)
 
 这是一个children下的第一个瓦片，观察不难得知，与root瓦片其实在属性上长得一模一样。
 
@@ -160,7 +160,7 @@ kd树比较难理解，在此不作展开，这也是一种有趣的空间结构
 
 Tile不仅仅可以在其uri属性中引用 诸如 `.b3dm`、`.i3dm`、`.pnts`等二进制瓦片数据文件，还可以再引用一个 3dTiles！
 
-![image-20200628021540942](E:\Code\my-dev-notes\3dtiles-Notes\tutorial\attachments\image-20200628021540942.png)
+![image-20200628021540942](attachments\image-20200628021540942.png)
 
 这是一份从osgb倾斜摄影数据转换而来的3dtiles数据，清晰可见在root瓦片的第一个child瓦片中，引用了另外一个json文件。这证明了两件事：
 

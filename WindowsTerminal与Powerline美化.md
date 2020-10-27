@@ -46,7 +46,7 @@ git-scm.org，自己下载安装即可
 ``` powershell
 Install-Module posh-git -Scope CurrentUser 
 Install-Module oh-my-posh -Scope CurrentUser
-Install-Module DirColor -Scope CurrentUser
+Install-Module DirColors -Scope CurrentUser
 ```
 
 安装colortool先确保scoop安装准确

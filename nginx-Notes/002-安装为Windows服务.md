@@ -1,5 +1,15 @@
 参考文档：https://www.cnblogs.com/Little-Wang/p/8514117.html
 
+
+
+# Attention!!!
+
+最好测试完再安装为Windows服务，否则会有一大堆的缓存问题导致不能生效。
+
+winsw现在有 NET4 NET4.6 和 NETCORE31 的三种发布包，未来估计还有 NET5 的，原理都一样。
+
+
+
 # 使用Winsw工具
 
 https://github.com/kohsuke/winsw/releases，下载合适的exe即可

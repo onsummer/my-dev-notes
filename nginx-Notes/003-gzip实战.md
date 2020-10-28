@@ -71,3 +71,28 @@ Access-Control-Allow-Methods: GET,POST,OPTIONS
 ![image-20201028152104340](attachments/image-20201028152104340.png)
 
 文件体积大幅度下降！
+
+# gltf实战
+
+启用前：
+
+![image-20201028153915570](attachments/image-20201028153915570.png)
+
+约72.4kb
+
+启用后：
+
+![image-20201028153228354](attachments/image-20201028153228354.png)
+
+约7.7kb
+
+
+
+对比表
+
+|          | 开启gzip | 关闭gzip |
+| -------- | -------- | -------- |
+| 文件大小 | 7.7kb    | 72.4kb   |
+| 计时     | 308.23ms | 313.13ms |
+
+文件传输的体积显著降低

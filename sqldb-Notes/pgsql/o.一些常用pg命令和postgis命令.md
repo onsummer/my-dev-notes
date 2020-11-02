@@ -139,3 +139,25 @@ where st_dwithin(
 );
 ```
 
+# 4. 数据库查询
+
+## 4.1. 数据库大小查询
+
+``` SQL
+select pg_size_pretty(pg_database_size('db_name'));
+```
+
+## 4.2. 数据表（关系）大小查询
+
+### ① 所有表
+
+``` SQL
+select relname, pg_size_pretty(pg_relation_size(relname)) from pg_stat_user_tables where schemaname = 'public' order by g_relation_size(relname) desc;
+```
+
+### ② 单个表
+
+``` SQL
+select pg_size_pretty(pg_relation_size('schemaname.table_name'));
+```
+

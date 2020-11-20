@@ -1,0 +1,1 @@
+https://desktop.arcgis.com/zh-cn/system-requirements/latest/database-requirements-sqlite.htm

@@ -1,6 +1,10 @@
 # 1. 简介
 
+将 根瓦片 继续切分。
 
+用**图层**来描述，通常结合 `3DTILES_metadata` 扩展一起使用。
+
+一个图层，可以指向一个 b3dm，也可以指向一个 gltf，也可以指向 tileset.json。除了数据内容的指向，还可以为图层指定元数据类，用元数据类来定义此图层有哪些属性。
 
 ![3DTILES_layers Spec Map](attachments/spec_map.jpg)
 

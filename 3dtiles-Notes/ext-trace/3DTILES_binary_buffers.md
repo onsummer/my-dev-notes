@@ -1,4 +1,21 @@
-允许外挂 二进制文件
+# 简介
+
+允许外挂二进制属性数据文件。
+
+# 可选性
+
+取决于你的数据。
+
+# JSON 格式更新
+
+`3DTILES_binary_buffers` 是 `extensions` 这个顶级属性的属性，它包含两个子属性：
+
+- `bufferView`（和 gltf 类似）
+- `buffer` （和gltf类似）
+
+JSON 格式参考：[tileset.3DTILES_binary_buffers.schema.json (github.com)](https://github.com/CesiumGS/3d-tiles/blob/3DTILES_binary_buffers/extensions/3DTILES_binary_buffers/schema/tileset.3DTILES_binary_buffers.schema.json)
+
+# 例子
 
 通过 tile 对象中的 extra 属性可以描述这个二进制文件存储了什么东西：
 

@@ -41,7 +41,7 @@ polygon.appearance.material = new Cesium.Material({
 polygon.appearance.material.uniforms.color = Cesium.Color.WHITE
 ```
 
-# 2. 内置材质（15种）
+# 2. 内置材质（共23种，ver1.75）
 
 Cesium 有几个内置的材质。列举两个比较常用的：
 

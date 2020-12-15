@@ -280,13 +280,14 @@ let fabric = {
 
 ``` JS
 let fabric = {
-  source: `czm_material czm_getMaterial(czm_materialInput materialInput)
-           {
-          	  czm_material m = czm_getDefaultMaterial(materialInput);
-          	  m.diffuse = vec3(0.5);
-           	  m.specular = 0.5;
-              return m;
-           }`
+  source: 
+  `czm_material czm_getMaterial(czm_materialInput materialInput)
+   {
+  	 czm_material m = czm_getDefaultMaterial(materialInput);
+  	 m.diffuse = vec3(0.5);
+  	 m.specular = 0.5;
+  	 return m;
+   }`
 }
 ```
 
@@ -319,7 +320,7 @@ let fabric = {
 
 一样的，可以把 diffuse 组件设置为 `materialInput.normalEC` 来可视化法线。
 
-除了 `materialInput` 这个传入的参数，还可以访问 Cesium 提供的 uniform 变量。
+除了 `materialInput` 这个传入的参数，还可以访问 uniforms 中的变量。
 
 例如，可以通过一个 color uniform 去设置 diffuse 组件和 alpha 组件，来创建自己的 Color 材质：
 

@@ -58,6 +58,8 @@ END-ISO-10303-21;
 
 官方地址：http://www.buildingsmart-tech.org/ifc/IFC4/Add2/html/
 
+官方4.3规范文档：[IFC4 Documentation (buildingsmart.org)](https://standards.buildingsmart.org/IFC/DEV/IFC4_3/RC2/HTML/)
+
 - IFC2x3参考手册
 
 国内地址：http://www.bim-times.com/ifc/ifc2x3/index.htm

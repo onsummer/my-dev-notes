@@ -93,9 +93,9 @@ $$
 > $$
 > 即第一列为 $\vec x$ 的变换结果。
 >
-> 所以，$R^{-1}_{view}= \begin{bmatrix} -\hat g × \vec t & \vec t & -\hat g & \vec a \end{bmatrix}$ 这个矩阵代表了将世界坐标三个轴旋转到 $-\hat g × \vec t 、 \vec t、 -\hat g$ 这三个向量上。
+> 所以，$R^{-1}_{view}= \begin{bmatrix} -\hat g × \vec t & \vec t & -\hat g & \vec a \end{bmatrix}$ 这个矩阵代表了将世界坐标的 xyz 三个轴旋转到 $-\hat g × \vec t 、 \vec t、 -\hat g$ 这三个向量上。
 
-旋转矩阵一定是正交矩阵，那么容易求得
+旋转矩阵一定是正交矩阵，其逆矩阵即转置，那么容易求得 $R_{view}$ 的真身
 $$
 R_{view} = (R^{-1}_{view})^T = \begin{bmatrix} 
 x_{\hat g × \vec t} & y_{\hat g × \vec t}  & z_{\hat g × \vec t}& 0 \\
@@ -118,7 +118,9 @@ x_{-\hat g } & y_{-\hat g } & z_{-\hat g }& 0 \\
 0&0&0&1 
 \end{bmatrix}
 $$
-综上，视图矩阵的计算只需 9 个数字，分别是 **相机的世界坐标**、**相机的目标向量**、**相机的上方向向量**。
+综上，视图矩阵的计算只需 9 个数字，即 **相机的世界坐标**、**相机的目标向量**、**相机的上方向向量**。
+
+> 有的函数库会把计算视图矩阵描述为计算 `lookAt`。
 
 ## 2.5. 将世界坐标系的某个点转换到相机坐标下
 
@@ -132,20 +134,54 @@ $$
 
 # 3. 投影变换（Projection Transform）
 
-视场内（远近平面内的区域）的物体投影到近平面，正交是视块，透视是四棱台。
+## 3.1. 可见区域
 
-## 3.1. 正交投影
+不管是正交投影，还是透视投影，都要先确定一个可见区域。为什么？因为确定可见区域本来就具备一定的实际意义，毕竟就算是人，在某个状态也只能看到眼前的一篇有限区域。相机也是一样的。
 
-往 $-Z$ 方向看，那么只需把 z 坐标去掉，结果就是投影到 $xOy$ 平面上的 **投影坐标** 了。
+这个可视区域，正交投影中是一个长方体，透视投影是倒放的四棱台（也叫截头四棱锥、截头体，英文名 Frustum）。
 
-然后，把投影结果缩放到 $xOy$ 上的 $[-1, 1]^2$ 的区域内即可（方便后续裁剪坐标计算）。
+正交投影的可见区域既然是一个长方体，那么确定一个长方体（注意，当前坐标已经是相机坐标系），需要什么参数呢？
+$$
+[x_{max}, \quad x_{min},\quad y_{max}, \quad y_{min},\quad z_{max}, \quad z_{min}] \\
+$$
+由三轴的最大最小值即可定义一个长方体，不妨设为
+$$
+[right, \quad left, \quad top, \quad bottom, \quad near, \quad far]\\
+$$
+简写为
+$$
+[r, \quad l, \quad t, \quad b,\quad n,\quad f]
+$$
+其中，n 和 f 如果是距离而不是坐标，那么应该写成：
+$$
+[r, \quad l, \quad t, \quad b,\quad -n,\quad -f]
+$$
 
-在图形学的计算中，假定给定一个长方体，由 $[x_{max}, x_{min},y_{max}, y_{min},z_{max}, z_{min},]$ 六个值定义，不妨写成 $[right, left, top, bottom, near, far]$，简写成 $[r, l, t,b,n,f]$ 。其正交投影的顺序是：
+
+因为相机是朝着 $-Z$ 方向看的，所以 n 和 f 要取负。
+
+## 3.2. 投影变换算出来是什么
+
+先回答：投影坐标（Projection Coordinates），仍然是三维的。
+
+正交投影的目的是，将长方体平移到相机坐标系中心，并将各个轴压缩至 $[-1, 1]^3$ 这个立方体空间内。
+
+透视投影的目的是，将截头体先压成正交投影的长方体，再进行正交变换到 $[-1, 1]^3$ 这个立方体空间内。
+
+而这两个立方体空间，都叫做投影坐标空间，执行投影变换就相当于把相机坐标系转换成了投影坐标系。
+
+> 为啥是 $[-1, 1]^3$？应该是方便后续裁剪、规范化操作吧
+
+## 3.2. 正交投影
+
+上面提及，正交投影算得的投影坐标，实际上经过了两个过程：
 
 - 平移至相机坐标系中心
-- 不管多大，缩放到 $[-1,1]^3$ 这个立方体内
+- 可见区域长方体缩放到 $[-1,1]^3$ 这个立方体内
 
-所以正交投影矩阵 $M_{ortho}$ 是：
+根据上文提及，正交投影的可视空间是一个长方体，由六个参数决定。
+
+利用这六个参数，构造平移矩阵和缩放矩阵。先计算的写右边，挨个左乘，所以正交投影矩阵 $M_{ortho}$ 是：
 $$
 \begin{align}
 M_{ortho} & = S_{ortho} · T_{ortho}\\ 
@@ -159,12 +195,176 @@ M_{ortho} & = S_{ortho} · T_{ortho}\\
 0 & 1 & 0 & \displaystyle -{\frac{t+b}{2}} \\
 0 & 0 & 1 & \displaystyle -{\frac{n+f}{2}} \\
 0 & 0 & 0 & 1 \\
+\end{bmatrix} \\
+& = \begin{bmatrix} 
+\displaystyle {\frac{2}{r-l}} & 0 & 0 & \displaystyle -{\frac{r+l}{2}} \\
+0 & \displaystyle {\frac{2}{t-b}} & 0 & \displaystyle -{\frac{t+b}{2}} \\
+0 & 0 & \displaystyle {\frac{2}{n-f}} & \displaystyle -{\frac{n+f}{2}} \\
+0 & 0 & 0 & 1 \\
 \end{bmatrix}
 \end{align}
 $$
 
-## 3.2. 透视投影
+伪代码给到
 
-透视投影矩阵的目的是，将相机坐标系下的坐标投射到近平面。
+``` JS
+function setOrtho(l, r, t, b, n, f) {
+  return new Matrix4(
+    2/(r-l), 0, 0, -(r+l)/2,
+    0, 2/(t-b), 0, -(t+b)/2,
+    0, 0, 2/(n-f), -(n+f)/2,
+    0, 0, 0, 1
+  )
+}
+```
 
-假设远平面的所有点先向中心缩放，挤压缩放到和近平面的 xOy 视口一样大，然后再做正交投影即能得到最终的结果。
+## 3.3. 透视投影
+
+### step1. 形变成（而不是相似变换成）一个长方体
+
+透视投影在正交投影之前做多了一步，将截头体形变成一个长方体。
+
+根据资料显示，这不是简单的z方向相似变换，而是一种非线性变换。
+
+形变过程中，有三点性质是不变的：
+
+- 近裁剪面的 xyz 均不变
+- 远裁剪面的 z 不变，xy变成近裁剪面的xy
+- 远裁剪面的中心点始终不变
+
+至于远近裁剪面之中的点，它们的 xyz，就不好说了。
+
+推演过程：
+
+存在形变矩阵 $M_{reshape}$，使得对于截头体内任意齐次坐标表示的一个点 $P_{view}=(x,y,z,1)$，在经过此矩阵变换后均落在以近裁剪面为底，$f - n$ 为深度的长方体内，不妨设变换后的点的齐次坐标为 $P'=(x', y',z',1)$
+
+易得
+$$
+P' = M_{reshape}·P_{view}
+$$
+从摄像机出发，引出一条射线，与远近裁剪面的交点分别为 $P_1=(x_1, y_1,z_1,1)、P_2=(x_2,y_2,z_2,1)$
+
+在经过 $M_{reshape}$ 变换后，根据相似三角形理论，$P_2$ 的 xy 值应该有如下关系
+$$
+x_1 = \frac{n}{f}x_2, \quad y_1 = \frac{n}{f}y_2 \\
+M_{reshape}·P_2
+=M_{reshape}·\begin{pmatrix} x_2 \\ y_2 \\ z_2 \\ 1 \end{pmatrix}
+=\begin{pmatrix} x_1 \\ y_1 \\ ? \\ 1 \end{pmatrix} 
+=\begin{pmatrix} \displaystyle \frac{n}{f}x_2 \\ \displaystyle \frac{n}{f}y_2 \\ ? \\ 1 \end{pmatrix}
+$$
+此时，由齐次坐标的概念，$\begin{pmatrix} \displaystyle \frac{n}{f}x_2 & \displaystyle \frac{n}{f}y_2 & ? & 1 \end{pmatrix}^T$ 实际上等价于 $\begin{pmatrix} nx_2 & ny_2 & ? & n \end{pmatrix}^T$
+
+即全部乘以 n，则等式变成
+$$
+M_{reshape}·P_2=M_{reshape}· \begin{pmatrix} x_2 \\ y_2 \\ z_2 \\ 1 \end{pmatrix}
+= \begin{pmatrix} nx_2 \\ ny_2 \\ ? \\ n \end{pmatrix}
+$$
+观察得知 $M_{reshape}$ 部分元素如下：
+$$
+M_{reshape} = \begin{bmatrix} n & 0 & 0 & 0 \\
+0 & n & 0 & 0\\
+? & ?& ?&? \\
+0 & 0 & 1 & 0
+\end{bmatrix}
+$$
+即满足
+$$
+P' =\begin{bmatrix} n & 0 & 0 & 0 \\
+0 & n & 0 & 0\\
+? & ?& ?&? \\
+0 & 0 & 1 & 0
+\end{bmatrix}·P_{view}
+$$
+
+
+令第三行向量为 $α=(a_1,a_2,a_3,a_4)$，根据性质 “近裁剪面的 xyz 均不变”，不妨取近裁剪面的中心点 $P_3=(x_3, y_3,n,1)$ 代入，得
+$$
+\begin{align}
+M_{reshape}·P_3= 
+\begin{bmatrix} n & 0 & 0 & 0 \\
+0 & n & 0 & 0\\
+a_1 & a_2 & a_3 & a_4 \\
+0 & 0 & 1 & 0
+\end{bmatrix} · \begin{pmatrix} x_3 \\ y_3 \\ n \\ 1 \end{pmatrix}=
+\begin{pmatrix} nx_3 \\ ny_3 \\ n^2 \\ n \end{pmatrix} \\
+即 \quad a_1x_3 + a_2y_3 + a_3n + a_4=n^2 \\
+∵ 等式右侧无x_3、y_3 \\
+此处不难得到\quad a_1 = 0,\quad a_2 =0\\
+即 \quad a_3n + a_4=n^2
+\end{align}
+$$
+根据性质 "远裁剪面的中心坐标不变"，设其为 $P_4=(0,0,f,1)$ 代入，的
+$$
+\begin{align}
+M_{reshape}·P_4
+=\begin{bmatrix} 
+n & 0 & 0 & 0 \\
+0 & n & 0 & 0\\
+0 & 0 & a_3 & a_4 \\
+0 & 0 & 1 & 0
+\end{bmatrix} · 
+\begin{pmatrix} 0 \\ 0 \\ f \\ 1 \end{pmatrix}=f^2 \\
+即\quad a_3f + a_4 = f^2
+\end{align}
+$$
+联立方程组
+$$
+\begin{cases}
+a_3·n + a_4 = n^2\\
+a_3·f + a_4 = f^2
+\end{cases}
+\quad二元一次方程组解得
+\begin{cases}
+a_3 = n + f \\
+a_4 = -nf
+\end{cases}
+$$
+所以矩阵 $M_{reshape}$ 为
+$$
+M_{reshape}
+=\begin{bmatrix} 
+n & 0 & 0 & 0 \\
+0 & n & 0 & 0\\
+0 & 0 & n+f & -nf \\
+0 & 0 & 1 & 0
+\end{bmatrix}
+$$
+即截头体内任何一点 $P_{view}$ 变换到正交可视长方体内对应点的计算为
+$$
+\begin{align}
+P' &= M_{reshape} · P_{view} \\
+&=\begin{bmatrix} 
+n & 0 & 0 & 0 \\
+0 & n & 0 & 0 \\
+0 & 0 & n+f & -nf \\
+0 & 0 & 1 & 0
+\end{bmatrix}·\begin{pmatrix} x \\ y \\ z \\ 1 \end{pmatrix}
+\end{align}
+$$
+
+
+### step2. 继续做一次正交投影
+
+最终，经过正交投影后，即得到透视投影矩阵
+$$
+\begin{align}
+M_{persp}&=M_{ortho}·M_{reshape} \\
+& = \begin{bmatrix}
+\displaystyle {\frac{2}{r-l}} & 0 & 0 & \displaystyle -{\frac{r+l}{2}} \\
+0 & \displaystyle {\frac{2}{t-b}} & 0 & \displaystyle -{\frac{t+b}{2}} \\
+0 & 0 & \displaystyle {\frac{2}{n-f}} & \displaystyle -{\frac{n+f}{2}} \\
+0 & 0 & 0 & 1 \\
+\end{bmatrix}·\begin{bmatrix} 
+n & 0 & 0 & 0 \\
+0 & n & 0 & 0 \\
+0 & 0 & n+f & -nf \\
+0 & 0 & 1 & 0
+\end{bmatrix} 
+\end{align}
+$$
+
+# 4. 透视投影的 fov-aspect 表达法
+
+
+
+# 5. 透视投影的 frustum 表达法

@@ -33,3 +33,5 @@
 - [快速分层剔除](https://cesium.com/blog/2015/08/04/fast-hierarchical-culling/)（尽快）
 - [计算遍历](https://cesium.com/blog/2015/09/22/compute-pass/)（尽快，较短）
 - [使用更贴合的视锥体以及为什么要视锥剔除](https://cesium.com/blog/2017/02/02/tighter-frustum-culling-and-why-you-may-want-to-disregard-it/)（尽快）
+- [视锥体地平线剔除算法](https://cesium.com/blog/2013/04/25/horizon-culling/)
+

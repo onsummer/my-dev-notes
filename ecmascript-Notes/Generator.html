@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    ["12.5","12.4","17.2","10"].sort((a, b) => {
+      let aspilt = a.split('.')
+      let bspilt = b.split('.')
+
+      if (aspilt.length === 1) {
+        aspilt.push(0)
+      }
+      if (bspilt.length === 1) {
+        bspilt.push(0)
+      }
+
+      let big = Number(aspilt[0]) - Number(bspilt[0])
+      let small = Number(aspilt[1]) - Number(bspilt[1])
+      return big === 0 ? -big : -small 
+    })
+
+    function* gen(args) {
+// -> 第一次 next() 开始
+      console.log('1st next() called, init args is: ', args)
+                 let a = yield 'step1'
+// 第二次 next() 开始↑  ↑第一次 next() 结束       || 第二次 next() 开始时，传入的参数 'arg1' 才会被 a 接收
+      console.log('2nd next() called, a is: ', a)
+                 let b = yield 'step2'
+// 第三次 next() 开始↑  ↑第二次 next() 结束       || 第三次 next() 开始时，传入的参数 'arg2' 才会被 b 接收
+      console.log('3rd next() called, b is: ', b)
+                 let c = yield 'step3'
+// 第三次 next() 开始↑  ↑第二次 next() 结束       || 第四次 next() 开始时，传入的参数 'arg3' 才会被 c 接收
+      console.log('4th next() called, c is: ', c)
+// -> 第四次 next() 结束
+    }
+    
+    let itor = gen('init args')
+    console.log(itor.next())
+    console.log(itor.next('arg1'))
+    console.log(itor.next('arg2'))
+    console.log(itor.next('arg3'))
+  </script>
+</body>
+</html>

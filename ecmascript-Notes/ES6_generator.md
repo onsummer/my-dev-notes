@@ -16,6 +16,8 @@ const colors = listColors()
 
 这个 `colors` 就是一个 **`generator`**，即生成器
 
+> 这个 * 放在哪都可以，贴 function 关键字也可以，贴函数名也可以。
+
 ## 怎么用它
 
 ``` JS
@@ -86,3 +88,36 @@ const result = genFunc.next()
 ```
 
 通常使用生成器的 next() 方法的返回值作为那一步操作的返回值，而 next() 方法当然也是可以传递参数的。
+
+
+
+
+
+# 4. next() 会走到哪一步
+
+看下列代码
+
+``` js
+function* gen(args) {
+// -> 第一次 next() 开始
+  console.log('1st next() called, init args is: ', args)
+  						 let a = yield 'step1'
+// 第二次 next() 开始↑  ↑第一次 next() 结束       || 第二次 next() 开始时，传入的参数 'arg1' 才会被 a 接收
+  console.log('2nd next() called, a from 2nd next() is: ', a)
+               let b = yield 'step2'
+// 第三次 next() 开始↑  ↑第二次 next() 结束       || 第三次 next() 开始时，传入的参数 'arg2' 才会被 b 接收
+  console.log('3rd next() called, b from 3rd next() is: ', b)
+               let c = yield 'step3'
+// 第三次 next() 开始↑  ↑第二次 next() 结束       || 第四次 next() 开始时，传入的参数 'arg3' 才会被 c 接收
+  console.log('4th next() called, c from 4th next() is: ', c)
+// -> 第四次 next() 结束
+}
+    
+let itor = gen('init args')
+console.log(itor.next())
+console.log(itor.next('arg1'))
+console.log(itor.next('arg2'))
+console.log(itor.next('arg3'))
+```
+
+![image-20210131022940767](attachments/image-20210131022940767.png)

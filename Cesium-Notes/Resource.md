@@ -10,7 +10,7 @@
 - [3d-Tiles 最初介绍](https://cesium.com/blog/2015/08/10/introducing-3d-tiles/)
 - [量化三维模型：减小体积](https://cesium.com/blog/2016/08/08/cesium-web3d-quantized-attributes/)（需要结合gltf翻译）
 - [OBB和BS的性能比较](https://cesium.com/blog/2015/06/24/oriented-bounding-boxes/)（需要翻译）
-- [WebGL 纹理压缩技术比较](https://cesium.com/blog/2017/02/06/texture-compression/)（下阶段尽快翻译）
+- [WebGL 纹理压缩技术比较](https://cesium.com/blog/2017/02/06/texture-compression/)
 - [3dTiles使用WebP提升速度](https://cesium.com/blog/2019/02/12/faster-3d-tiles-streaming-webp/)
 - [3dTiles 的合理分层](https://cesium.com/blog/2017/02/17/hierarchical-culling-with-children-bounding-volumes/)（下阶段尽快翻译）
 - [优化3dTiles数据结构](https://cesium.com/blog/2017/03/30/spatial-subdivision/)（下阶段尽快翻译）
@@ -33,3 +33,5 @@
 - [快速分层剔除](https://cesium.com/blog/2015/08/04/fast-hierarchical-culling/)（尽快）
 - [计算遍历](https://cesium.com/blog/2015/09/22/compute-pass/)（尽快，较短）
 - [使用更贴合的视锥体以及为什么要视锥剔除](https://cesium.com/blog/2017/02/02/tighter-frustum-culling-and-why-you-may-want-to-disregard-it/)（尽快）
+- [视锥体地平线剔除算法](https://cesium.com/blog/2013/04/25/horizon-culling/)
+

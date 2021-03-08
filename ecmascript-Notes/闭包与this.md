@@ -131,11 +131,27 @@ const x = {
 x.wait() // { wait: f }
 ```
 
-这里的 this 虽然调用者是 window 下的 setTimeout，但是输出却是 x。
+改成这样：
 
-原因就在于，这个箭头函数定义于 x 对象下，作为参数传给 setTimeout 罢了。
+``` js
+const x = {
+    wait: () => {
+        setTimeout(() => {
+            console.log(this)
+        })
+    }
+}
 
-所以这个箭头函数里头的 this，就指向的是 “该箭头函数定义之处：x”。
+x.wait() // Window { 。。。 }
+```
+
+方法：
+
+若this在箭头函数，那就把它往外拉一层（因为箭头函数里并没有this），直到当前层（作用域）存在this为止。
+
+例如，第一种情况，this外拉一层，与 setTimeout() 执行语句并列，那么作用域就是 wait() 这个普通对象方法，它的this是存在的，即x本身；
+
+第二种情况，this 拉到 wait() 的作用域后，发现 wait() 还是箭头函数，那就拉到 x 中，拉到 x 之后与 x 的字段并列，而 x 的字段如果是 this，那么这个字段就是 Window。
 
 ## ⑤ 改变 this：bind、call、apply
 

@@ -40,7 +40,6 @@ async function render() {
         [[location(0)]] var<out> out_color: vec4<f32>;
         [[location(0)]] var<in> in_position_2d: vec2<f32>;
         [[location(1)]] var<in> in_color_rgba: vec4<f32>;
-
         [[stage(vertex)]]
         fn main() -> void {
           out_position = vec4<f32>(in_position_2d, 0.0, 1.0);
@@ -68,7 +67,6 @@ async function render() {
         code: `
         [[location(0)]] var<out> outColor: vec4<f32>;
         [[location(0)]] var<in> in_color: vec4<f32>;
-
         [[stage(fragment)]]
         fn main() -> void {
           outColor = in_color;

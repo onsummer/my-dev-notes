@@ -50,11 +50,11 @@ fn main() -> void {
 
 ``` wgsl
 [[location(0)]] var<out> fragColor: vec4<f32>;
-[[location(0)]] var<in> in_color: vec3<f32>;
+[[location(0)]] var<in> in_color: vec4<f32>;
 [[stage(fragment)]]
 
 fn main() -> void {
-	fragColor = vec4<f32>(in_color, 1.0);
+	fragColor = in_color;
 	return;
 }
 ```

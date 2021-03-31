@@ -1,15 +1,19 @@
+![image-20210331162931020](attachments/image-20210331162931020.png)
+
+
+
 # 创建buffer
 
 与 WebGL 的 `gl.createBuffer()` 几乎一样。
 
 ``` js
-const vBuffer = new Float32Array([
-  0.0, 1.0,
-  0.1, 1.4,
-  1.2, 0.5
+const vbodata = new Float32Array([
+  -0.5, 0.0, 1.0, 0.0, 0.0, 1.0,
+  0.0, 0.5, 0.0, 1.0, 0.0, 1.0,
+  0.5, 0.0, 0.0, 0.0, 1.0, 1.0
 ])
-const buffer = device.createBuffer({
-  size: vBuffer.byteLength, 
+const vbo = device.createBuffer({
+  size: vbodata.byteLength, 
   usage: GPUBufferUsage.VERTEX,
   mappedAtCreation: true
 })
@@ -18,8 +22,8 @@ const buffer = device.createBuffer({
 与 Float32Array 的绑定，跟 WebGL 就完全不同了：
 
 ``` js
-new Float32Array(buffer.getMappedRange()).set(/* 顶点属性f32数组 */)
-buffer.unmap()
+new Float32Array(buffer.getMappedRange()).set(vbodata)
+vbo.unmap()
 ```
 
 创建一个坐标缓存，一个颜色缓存。
@@ -28,7 +32,7 @@ buffer.unmap()
 
 ``` wgsl
 [[builtin(position)]] var<out> out_position: vec4<f32>;
-[[location(0)]] var<out> out_color: vec3<f32>;
+[[location(0)]] var<out> out_color: vec4<f32>;
 [[location(0)]] var<in> in_position_2d: vec2<f32>;
 [[location(1)]] var<in> in_color_rgba: vec4<f32>;
 
@@ -50,11 +54,11 @@ fn main() -> void {
 
 ``` wgsl
 [[location(0)]] var<out> fragColor: vec4<f32>;
-[[location(0)]] var<in> in_color: vec3<f32>;
-[[stage(fragment)]]
+[[location(0)]] var<in> in_color: vec4<f32>;
 
+[[stage(fragment)]]
 fn main() -> void {
-	fragColor = vec4<f32>(in_color, 1.0);
+	fragColor = in_color;
 	return;
 }
 ```
@@ -67,10 +71,9 @@ fn main() -> void {
 
 ``` js
 const pipeline = device.createRenderPipeline({
-  vertex: // 略
-  fragment: // 略
-  vertexState: {
-  	vertexBuffers: [{
+  vertex: {
+    ... // 其他参数同 01 的
+    buffers: [{
   		arrayStride: 2 * vBuffer.BYTES_PER_ELEMENT, // 2x4byte 作为一个顶点坐标数据
   		attributes: [{
   			shaderLocation: 0,
@@ -85,15 +88,16 @@ const pipeline = device.createRenderPipeline({
   			format: "float4
 			}]
 		}]
-	}
+  },
+  fragment: , // 略
+	primitive: , // 略
 })
 ```
 
 最后，在通道编码器指定坐标缓存、颜色缓存。
 
 ``` js
-passEncoder.setVertexBuffer(0, verticesBuffer)
-passEncoder.setVertexBuffer(1, colorBuffer)
+passEncoder.setVertexBuffer(0, vbo)
 ```
 
 # 数据交错
@@ -102,6 +106,3 @@ passEncoder.setVertexBuffer(1, colorBuffer)
 
 或者合并 vertexBuffer 对象下的 attributes 属性。
 
-# 参考
-
-https://hypnosnova.github.io/WebGPU-Tutorials/chapter1/BUFFER.html

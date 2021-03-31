@@ -7,3 +7,13 @@
 `3DTILES_implicit_tiling`：更科学规范地组织瓦片的空间结构（莫顿编码）
 
 最后一个 隐式瓦片扩展，最为重要，其次是 metadata 扩展。
+
+# 2021.03.31
+
+layers 扩展参考了 i3s 的 bim 类型
+
+![image-20210331121051694](attachments/image-20210331121051694.png)
+
+implicit_tiling 借鉴了 nodepage 的同时，并严格了空间切分算法
+
+metadata 则借鉴了 node resource，将空间、图形、属性数据安排好了

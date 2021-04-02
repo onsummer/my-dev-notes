@@ -9,6 +9,17 @@ const vbodata = new Float32Array([
   0.5, 0.0, 0.0, 0.0, 1.0, 1.0
 ])
 
+// --- create texture data --- //
+const textureCanvas = document.createElement('canvas')
+const textureCanvasCtx = textureCanvas.getContext('2d')
+const img = document.createElement('img')
+img.src = "texture.png"
+textureCanvas.width = img.width
+textureCanvas.height = img.height
+textureCanvasCtx.drawImage(img, 0, 0)
+const textureBuffer = textureCanvasCtx.getImageData(0, 0, img.width, img.height).data
+// --- end --- //
+
 async function render() {
   if (!navigator.gpu) {
     alert('你的浏览器不支持 WebGPU 或未开启 WebGPU 支持')
@@ -23,6 +34,32 @@ async function render() {
     device,
     format: swapChainFormat
   })
+
+  // --- create sampler --- //
+  const sampler = device.createSampler({
+    minFilter: "linear",
+    magFilter: "linear"
+  })
+  // --- end --- //
+  // --- create texture --- //
+  const texture = device.createTexture({
+    size: [img.width, img.height], // 256, 256
+    format: "rgba8unorm",
+    usage: GPUTextureUsage.SAMPLED | GPUTextureUsage.COPY_DST
+  })
+  // --- end --- //
+
+  // --- flash texture buffer to gpu --- //
+  // console.log(device.queue.writeTexture)
+  device.queue.writeTexture(
+    { texture },
+    textureBuffer,
+    { bytesPerRow: img.width * 4 }, // rgba
+    [
+      img.width, img.height, 1
+    ]
+  )
+  // --- end --- //
 
   const vbo = device.createBuffer({
     size: vbodata.byteLength,

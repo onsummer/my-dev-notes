@@ -101,3 +101,26 @@ function requestNewFrame() {
 
 requestNewFrame()
 ```
+
+或者使用异步的写法
+
+``` js
+async function init(/*参数*/) {
+  const adapter = await ...// 请求适配器
+	const gtx4090ti = await ...// 请求设备
+	const swapChain = // 从canvas上下文中获取交换链
+  
+  const requestNewFrame = () => {
+    /*
+     创建管线、编码器，使用编码器进行绘制
+    */
+    requestAnimationFrame(requestNewFrame)
+  }
+  return requestNewFrame
+}
+
+init(/*传参*/).then(requestFn => {
+  requestFn()
+})
+```
+

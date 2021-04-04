@@ -108,17 +108,15 @@ async function render() {
       module: device.createShaderModule({
         code: `
         [[builtin(position)]] var<out> out_position: vec4<f32>;
-        [[location(0)]] var<out> out_uv: vec2<f32>;
-        [[location(1)]] var<out> fragPosition: vec4<f32>;
+        [[location(0)]] var<out> out_st: vec2<f32>;
 
         [[location(0)]] var<in> in_position_2d: vec2<f32>;
-        [[location(1)]] var<in> in_uv: vec2<f32>;
+        [[location(1)]] var<in> in_st: vec2<f32>;
         
         [[stage(vertex)]]
         fn vertex_main() -> void {
-          fragPosition = 0.5 * (vec4<f32>(in_position_2d, 0.0, 1.0) + vec4<f32>(1.0, 1.0, 1.0, 1.0));
           out_position = vec4<f32>(in_position_2d, 0.0, 1.0);
-          out_uv = in_uv;
+          out_st = in_st;
           return;
         }
         `
@@ -147,12 +145,11 @@ async function render() {
 
         [[location(0)]] var<out> outColor: vec4<f32>;
         
-        [[location(0)]] var<in> in_uv: vec2<f32>;
-        [[location(1)]] var<in> fragPosition: vec4<f32>;
+        [[location(0)]] var<in> in_st: vec2<f32>;
         
         [[stage(fragment)]]
         fn frag_main() -> void {
-          outColor = textureSample(myTexture, mySampler, in_uv) * fragPosition;
+          outColor = textureSample(myTexture, mySampler, in_st);
           return;
         }
         `

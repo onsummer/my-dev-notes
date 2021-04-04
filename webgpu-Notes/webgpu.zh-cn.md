@@ -1,6 +1,30 @@
 # 1 介绍
 
+图形处理单元，或者简写为 GPU，在个人计算中已经实现了丰富的渲染效果和并行计算（挖矿等）。WebGPU 是一个向 Web 端暴露了 GPU 硬件能力的 API。
 
+WebGPU 借鉴了诸如 Vulkan、D3D12、Metal 等原生的 API。
+
+WebGPU 跟 WebGL、OpenGL ES 毫无关系。
+
+WebGPU 将物理GPU硬件视为 `GPUAdapter`。通过 `GPUDevice` 可以连接到一个 adapter。`GPUDevice`（设备）管理着有关资源以及  `GPUQueue`（GPU队列）。GPU队列执行一系列的命令。
+
+GPUDevice 拥有能高速访问处理单元的显存。
+
+`GPUBuffer` 和 `GPUTexture` 是显存背后真实的物理资源。
+
+`GPUCommandBuffer` 和 `GPURenderBundle` 是用户命令的容器。
+
+`GPUShaderModule` 包含了着色器代码。
+
+其他资源，例如 `GPUSampler` 或 `GPUBindGroup`，配置了 GPU 如何使用上述物理资源的方法。
+
+GPU 执行编码在 `GPUCommandBuffer` 中的各种命令，命令执行时所需的数据来自 `pipeline`。
+
+`pipeline` 是一个混合了函数、可编程阶段的对象。
+
+**可编程阶段** 执行着色器，着色器是一些 GPU 才能执行的特定设计出来的代码程序。
+
+大多数 pipeline 的状态由 `GPURenderPipeline` 或 `GPUComputePipeline` 对象定义。在 pipeline 之外的状态将在编码命令时设置，例如 `beginRenderPass()` 或 `setBlendColor()`。
 
 # 2 Malicious use considerations
 
@@ -153,7 +177,67 @@ GPUDevice includes GPUObjectBase;
 
 # 6 纹理与纹理视图
 
-## 6.1 GPUTexture
+todo
+
+## 6.1 `GPUTexture`
+
+```
+[Serializable]
+interface GPUTexture {
+    GPUTextureView createView(optional GPUTextureViewDescriptor descriptor = {});
+
+    undefined destroy();
+};
+GPUTexture includes GPUObjectBase;
+```
+
+### 6.1.1 创建纹理
+
+``` 
+dictionary GPUTextureDescriptor : GPUObjectDescriptorBase {
+  required GPUExtent3D size;
+  GPUIntegerCoordinate mipLevelCount = 1;
+  GPUSize32 sampleCount = 1;
+  GPUTextureDimension dimension = "2d";
+  required GPUTextureFormat format;
+  required GPUTextureUsageFlags usage;
+};
+```
+
+```
+enum GPUTextureDimension {
+	"1d",
+	"2d",
+	"3d",
+};
+```
+
+``` 
+typedef [EnforceRange] unsigned long GPUTextureUsageFlags;
+interface GPUTextureUsage {
+  const GPUFlagsConstant COPY_SRC          = 0x01;
+  const GPUFlagsConstant COPY_DST          = 0x02;
+  const GPUFlagsConstant SAMPLED           = 0x04;
+  const GPUFlagsConstant STORAGE           = 0x08;
+  const GPUFlagsConstant RENDER_ATTACHMENT = 0x10;
+};
+```
+
+函数如下：
+
+``` 
+createTexture(descriptor)
+```
+
+其参数对象 `descriptor` 如下：
+
+| 参数名     | 类型                   | 是否可空 | 是否可选 | 描述                             |
+| ---------- | ---------------------- | -------- | -------- | -------------------------------- |
+| descriptor | `GPUTextureDescriptor` | no       | no       | 描述了一个 GPUTexture 如何被创建 |
+
+返回一个 `GPUTexture` 对象。
+
+
 
 ## 6.2 GPUTextureView
 

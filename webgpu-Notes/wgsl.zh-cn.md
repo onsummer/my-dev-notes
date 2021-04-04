@@ -28,19 +28,21 @@
 
 ## 3.1 类型检查
 
-## 3.2 Void 类型
+## 3.2 普通类型
 
-## 3.3 Value 类型
+## 3.3 (TODO) Memory 类型
 
-## 3.4 (TODO) Memory 类型
+## 3.4 (TODO) Pointer 类型
 
-## 3.5 (TODO) Pointer 类型
+## 3.5 Texture 和 Sampler 类型
 
-## 3.6 Texture 和 Sampler 类型
+`texel`，全称 `texture element`，是纹理元素中最小的独立的无依赖的单元，它可能是标量或向量。
 
-## 3.7 (TODO) 类型别名
+`texture` 是 `texel` 的容器，它用来进行一些针对渲染的特定的操作。在 `WGSL` 中，这些操作通过触发纹理有关的内置函数来进行。
 
-## 3.8 类型声明规则
+## 3.6 (TODO) 类型别名
+
+## 3.7 类型声明规则
 
 # 4 变量和常量
 

@@ -1,22 +1,22 @@
 /*
-  2021年4月3日 
+  2021年4月5日 
 */
 
 const canvas = document.getElementById('gpuweb')
 const vbodata = new Float32Array([
-  -0.5, 0.0, -0.5, 0.0,
-  0.0, 0.5, 0.0, 0.5,
-  0.5, 0.0, 0.5, 0.0
+  -1.0, -1.0, 0.0, 1.0,
+  0.0, 1.0, 0.5, 0.0,
+  1.0, -1.0, 1.0, 1.0
 ])
 
 // --- create texture data --- //
-const textureCanvas = document.createElement('canvas')
-const textureCanvasCtx = textureCanvas.getContext('2d')
-const img = document.getElementById('texture')
-textureCanvas.width = img.width
-textureCanvas.height = img.height
-textureCanvasCtx.drawImage(img, 0, 0)
-const textureBuffer = textureCanvasCtx.getImageData(0, 0, img.width, img.height).data
+// const textureCanvas = document.createElement('canvas')
+// const textureCanvasCtx = textureCanvas.getContext('2d')
+
+// textureCanvas.width = img.width
+// textureCanvas.height = img.height
+// textureCanvasCtx.drawImage(img, 0, 0)
+// const textureBuffer = textureCanvasCtx.getImageData(0, 0, img.width, img.height).data
 // --- end --- //
 
 async function render() {
@@ -57,13 +57,18 @@ async function render() {
   const pipelineLayout = device.createPipelineLayout({
     bindGroupLayouts: [bindGroupLayout],
   })
-
+  
   // --- create sampler --- //
   const sampler = device.createSampler({
     minFilter: "linear",
     magFilter: "linear"
   })
   // --- end --- //
+
+  const img = document.createElement('img')
+  img.src = 'texture.png'
+  await img.decode()
+  const imageBitmap = await createImageBitmap(img)
   // --- create texture --- //
   const texture = device.createTexture({
     size: [img.width, img.height], // 256, 256
@@ -73,18 +78,22 @@ async function render() {
   // --- end --- //
 
   // --- flash texture buffer to gpu --- //
-  // console.log(device.queue.writeTexture)
-  device.queue.writeTexture(
-    { texture },
-    textureBuffer,
-    { bytesPerRow: img.width * 4 }, // rgba
-    [
-      img.width, img.height, 1
-    ]
-  )
+  // device.queue.writeTexture(
+  //   { texture },
+  //   imageBitmap,
+  //   { bytesPerRow: img.width * 4 }, // rgba
+  //   [
+  //     img.width, img.height, 1
+  //   ]
+  // )
+
+  device.queue.copyImageBitmapToTexture({
+    imageBitmap: imageBitmap
+  }, {
+    texture: texture
+  }, [img.width, img.height, 1])
   // --- end --- //
 
-  
   const vbo = device.createBuffer({
     size: vbodata.byteLength,
     usage: GPUBufferUsage.VERTEX,
@@ -92,7 +101,7 @@ async function render() {
   })
   new Float32Array(vbo.getMappedRange()).set(vbodata)
   vbo.unmap()
-  
+
   const pipeline = device.createRenderPipeline({
     layout: pipelineLayout,
     vertex: {
@@ -100,19 +109,21 @@ async function render() {
         code: `
         [[builtin(position)]] var<out> out_position: vec4<f32>;
         [[location(0)]] var<out> out_uv: vec2<f32>;
-        
+        [[location(1)]] var<out> fragPosition: vec4<f32>;
+
         [[location(0)]] var<in> in_position_2d: vec2<f32>;
         [[location(1)]] var<in> in_uv: vec2<f32>;
         
         [[stage(vertex)]]
-        fn main() -> void {
+        fn vertex_main() -> void {
+          fragPosition = 0.5 * (vec4<f32>(in_position_2d, 0.0, 1.0) + vec4<f32>(1.0, 1.0, 1.0, 1.0));
           out_position = vec4<f32>(in_position_2d, 0.0, 1.0);
           out_uv = in_uv;
           return;
         }
         `
       }),
-      entryPoint: 'main',
+      entryPoint: 'vertex_main',
       buffers: [{
         arrayStride: 4 * vbodata.BYTES_PER_ELEMENT,
         attributes: [{
@@ -135,16 +146,18 @@ async function render() {
         [[binding(1), group(0)]] var myTexture: texture_2d<f32>;
 
         [[location(0)]] var<out> outColor: vec4<f32>;
-        [[location(1)]] var<in> in_uv: vec2<f32>;
+        
+        [[location(0)]] var<in> in_uv: vec2<f32>;
+        [[location(1)]] var<in> fragPosition: vec4<f32>;
         
         [[stage(fragment)]]
-        fn main() -> void {
-          outColor = textureSample(myTexture, mySampler, in_uv);
+        fn frag_main() -> void {
+          outColor = textureSample(myTexture, mySampler, in_uv) * fragPosition;
           return;
         }
         `
       }),
-      entryPoint: 'main',
+      entryPoint: 'frag_main',
       targets: [
         {
           format: swapChainFormat
@@ -153,7 +166,7 @@ async function render() {
     },
     primitive: {
       topology: 'triangle-list',
-      cullMode: 'back',
+      // cullMode: 'back',
     },
   })
   const uniformBindGroup = device.createBindGroup({
@@ -170,30 +183,34 @@ async function render() {
     ]
   })
 
-  const commandEncoder = device.createCommandEncoder()
-  const textureView = swapChain.getCurrentTexture().createView()
-  const renderPassDescriptor = {
-    colorAttachments: [
-      {
-        attachment: textureView,
-        loadValue: {
-          r: 0.0,
-          g: 0.0,
-          b: 0.0,
-          a: 1.0
+  return function requestNewFrame() {
+    const commandEncoder = device.createCommandEncoder()
+    const textureView = swapChain.getCurrentTexture().createView()
+    const renderPassDescriptor = {
+      colorAttachments: [
+        {
+          attachment: textureView,
+          loadValue: {
+            r: 0.0,
+            g: 0.0,
+            b: 0.0,
+            a: 1.0
+          }
         }
-      }
-    ]
+      ]
+    }
+
+    const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor)
+    passEncoder.setPipeline(pipeline)
+    passEncoder.setBindGroup(0, uniformBindGroup)
+    passEncoder.setVertexBuffer(0, vbo)
+    passEncoder.draw(3, 1, 0, 0)
+    passEncoder.endPass()
+    
+    device.queue.submit([commandEncoder.finish()])
+
+    // requestAnimationFrame(requestNewFrame)
   }
-
-  const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor)
-  passEncoder.setPipeline(pipeline)
-  passEncoder.setBindGroup(0, uniformBindGroup)
-  passEncoder.setVertexBuffer(0, vbo)
-  passEncoder.draw(3, 1, 0, 0)
-  passEncoder.endPass()
-
-  device.queue.submit([commandEncoder.finish()])
 }
 
-render()
+render().then(requestNewFrame => requestNewFrame())

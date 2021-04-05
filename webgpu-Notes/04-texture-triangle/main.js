@@ -66,7 +66,7 @@ async function render() {
   // --- end --- //
 
   const img = document.createElement('img')
-  img.src = 'texture.png'
+  img.src = 'texture.webp'
   await img.decode()
   const imageBitmap = await createImageBitmap(img)
   // --- create texture --- //

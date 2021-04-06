@@ -1,0 +1,21 @@
+html, body {
+  padding: 0px;
+  margin: 0px;
+}
+
+body div {
+  margin: 0px; 
+  padding: 0px; 
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  background-image: linear-gradient(to bottom, #222, rgb(56, 22, 56));
+  width: 100vw;
+  height: 100vh;
+}
+
+body div canvas {
+  width: 800px; 
+  height: 600px; 
+  background-color: rgba(131, 131, 150, 0.5);
+}

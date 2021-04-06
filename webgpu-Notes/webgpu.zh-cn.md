@@ -46,11 +46,134 @@ GPU 执行编码在 `GPUCommandBuffer` 中的各种命令，命令执行时所�
 
 ## 3.3 坐标系统
 
+WebGPU 的坐标系与 DirectX、Metal 的类似。
+
+- NDC中，y轴朝上。x、y 轴值域均为 [-1, 1]，z 轴值域是 [0, 1]
+- 帧缓存中，y轴朝下，视口坐标和像素坐标的原点均在左上角
+- 窗口（像素）坐标与帧缓存的坐标是匹配的
+- 纹理坐标，其原点对应内存中的纹理数据的起始位置
+
 ## 3.4 编程模型
 
 ## 3.5 核心内部对象
 
+### 3.5.1 适配器
+
+### 3.5.2 设备
+
 ## 3.6 可选功能
+
+### 3.6.1 特点
+
+### 3.6.2 局限性
+
+就是设备的一些最大极限信息。
+
+- maxTextureDimension1D
+
+  8192
+
+- maxTextureDimension2D
+
+  8192
+
+- maxTextureDimension3D
+
+  2048
+
+- maxTextureArrayLayers
+
+  2048
+
+- maxBindGroups
+
+  4个
+
+- maxDynamicUniformBuffersPerPipelineLayout
+
+  8个
+
+- maxDynamicStorageBuffersPerPipelineLayout
+
+  4个
+
+- maxSampledTexturesPerShaderStage
+
+  16个
+
+- maxSamplersPerShaderStage
+
+  16个
+
+- maxStorageBuffersPerShaderStage
+
+  4个
+
+- maxStorageTexturesPerShaderStage
+
+  4个
+
+- maxUniformBuffersPerShaderStage
+
+  12个
+
+- maxUniformBufferBindingSize
+
+  16KB
+
+- maxStorageBufferBindingSize
+
+  128MB
+
+- maxVertexBuffers
+
+  8个
+
+- maxVertexAttributes
+
+  16个
+
+- maxVertexBufferArrayStride
+
+  2048 byte
+
+#### 3.6.2.1 `GPUAdapterLimits`
+
+```
+[Exposed=Window]
+interface GPUAdapterLimits {
+    readonly attribute unsigned long maxTextureDimension1D;
+    readonly attribute unsigned long maxTextureDimension2D;
+    readonly attribute unsigned long maxTextureDimension3D;
+    readonly attribute unsigned long maxTextureArrayLayers;
+    readonly attribute unsigned long maxBindGroups;
+    readonly attribute unsigned long maxDynamicUniformBuffersPerPipelineLayout;
+    readonly attribute unsigned long maxDynamicStorageBuffersPerPipelineLayout;
+    readonly attribute unsigned long maxSampledTexturesPerShaderStage;
+    readonly attribute unsigned long maxSamplersPerShaderStage;
+    readonly attribute unsigned long maxStorageBuffersPerShaderStage;
+    readonly attribute unsigned long maxStorageTexturesPerShaderStage;
+    readonly attribute unsigned long maxUniformBuffersPerShaderStage;
+    readonly attribute unsigned long maxUniformBufferBindingSize;
+    readonly attribute unsigned long maxStorageBufferBindingSize;
+    readonly attribute unsigned long maxVertexBuffers;
+    readonly attribute unsigned long maxVertexAttributes;
+    readonly attribute unsigned long maxVertexBufferArrayStride;
+};
+```
+
+
+
+#### 3.6.2.2 `GPUAdapterFeatures`
+
+```
+[Exposed=Window]
+interface GPUAdapterFeatures {
+    readonly setlike<GPUFeatureName>;
+};
+```
+
+
 
 # 4 初始化
 
@@ -253,7 +376,63 @@ createTexture(descriptor)
 
 ## 8.1 GPUBindGroupLayout
 
+### 8.1.1 创建
+
+通过 `GPUDevice.prototype.createBindGroupLayout()` 创建。
+
+```
+dictionary GPUBindGroupLayoutDescriptor : GPUObjectDescriptorBase {
+    required sequence<GPUBindGroupLayoutEntry> entries;
+};
+```
+
+`GPUBindGroupLayoutEntry` 描述了一个在着色器中能使用的资源。
+
+```
+typedef [EnforceRange] unsigned long GPUShaderStageFlags;
+[Exposed=Window]
+interface GPUShaderStage {
+    const GPUFlagsConstant VERTEX   = 0x1;
+    const GPUFlagsConstant FRAGMENT = 0x2;
+    const GPUFlagsConstant COMPUTE  = 0x4;
+};
+
+dictionary GPUBindGroupLayoutEntry {
+    required GPUIndex32 binding;
+    required GPUShaderStageFlags visibility;
+
+    GPUBufferBindingLayout buffer;
+    GPUSamplerBindingLayout sampler;
+    GPUTextureBindingLayout texture;
+    GPUStorageTextureBindingLayout storageTexture;
+};
+```
+
+
+
 ## 8.2 GPUBindGroup
+
+`GPUBindGroup` 定义了一组在着色器中使用的资源。
+
+```
+[Exposed=Window]
+interface GPUBindGroup {
+};
+GPUBindGroup includes GPUObjectBase;
+```
+
+### 8.2.1 创建
+
+通过 `GPUDevice.prototype.createBindGroup()` 创建。传入一个 `GPUBindGroupDescriptor` 对象。
+
+```
+dictionary GPUBindGroupDescriptor : GPUObjectDescriptorBase {
+    required GPUBindGroupLayout layout;
+    required sequence<GPUBindGroupEntry> entries;
+};
+```
+
+
 
 ## 8.3 GPUPipeLineLayout
 
@@ -268,6 +447,42 @@ createTexture(descriptor)
 ## 10.2 GPUComputePipeline
 
 ## 10.3 GPURenderPipeline
+
+### 10.3.1 创建
+
+### 10.3.2 图元裁剪
+
+### 10.3.3 栅格化
+
+栅格化，是指将装配好的图元映射到帧缓存的硬件处理阶段。**帧缓存**，是 `GPURenderPassEncoder` 的一个渲染附件。
+
+首先，顶点裁剪并转换到 NDC（规范化设备坐标系统），令输出坐标是 p，那么 NDC 坐标如下计算：
+$$
+ndc(p) = vector(p.x / p.w, p.y / p.w, p.z / p.w)
+$$
+然后，将视口设为当前渲染通道的视口，设NDC坐标为 n，它将转为帧缓存坐标：
+$$
+frameBufferCoords(n) = vector(viewport.x + 0.5(n.x + 1) × viewport.width, viewport.y + 0.5×(n.y + 1) × viewport.height)
+$$
+
+
+### 10.3.4 无颜色输出
+
+### 10.3.5 Alpha to Coverage
+
+### 10.3.6 Sample Masking
+
+### 10.3.7 图元状态
+
+### 10.3.8 多重采样状态
+
+### 10.3.9 片元状态
+
+### 10.3.10 颜色目标状态
+
+### 10.3.11 深度/模板状态
+
+### 10.3.12 顶点状态
 
 # 11 命令缓存
 
@@ -298,6 +513,48 @@ createTexture(descriptor)
 # 15 渲染通道
 
 ## 15.1 GPURenderPassEncoder
+
+### 15.1.1 创建
+
+``` 
+dictionary GPURenderPassDescriptor : GPUObjectDescriptorBase {
+    required sequence<GPURenderPassColorAttachment> colorAttachments;
+    GPURenderPassDepthStencilAttachment depthStencilAttachment;
+    GPUQuerySet occlusionQuerySet;
+};
+```
+
+#### 15.1.1.1 颜色附件
+
+``` 
+dictionary GPURenderPassColorAttachment {
+    required GPUTextureView view;
+    GPUTextureView resolveTarget;
+
+    required (GPULoadOp or GPUColor) loadValue;
+    required GPUStoreOp storeOp;
+};
+```
+
+- view `GPUTextureView`，颜色附件要输出到这个纹理上
+- resolveTarget `GPUTextureView`，若要进行多次采样，则使用此纹理视图进行接收
+- loadValue `GPULoadOp / GPUColor`，若为 GPULoadOp则表示在执行渲染通道的命令前在视图上执行加载操作，否则表示在执行渲染通道的命令前清除视图后填充的颜色值。
+
+#### 15.1.1.2 深度/模板附件
+
+#### 15.1.1.3 加载/存储行为
+
+### 15.1.2 绘制
+
+### 15.1.3 栅格化状态
+
+### 15.1.4 查询
+
+### 15.1.5 Bundles
+
+- executeBundles(bundles)
+
+  当一个 `GPURenderBundle` 执行时，渲染通道的流水线、绑定组、顶点或索引缓存将不会被继承。执行完毕，pipeline、绑定组、顶点和索引缓存将被清空。
 
 # 16 Bundles
 

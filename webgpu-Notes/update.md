@@ -11,3 +11,13 @@
 `GPURenderPassDescriptor` 中 `GPURenderPassDepthStencilAttachment`
 
 - [属性名称更改] attachment -> value
+
+# 2021年4月12日
+
+`GPURenderPassDescriptor` > `GPURenderPassColorAttachment` >
+
+- [属性名更改] `value` -> `view`: `GPUTextureView`
+
+`GPURenderPassDescriptor` > `GPURenderPassDepthStencilAttachment` >
+
+- [属性名更改] `value` -> `view`: `GPUTextureView`

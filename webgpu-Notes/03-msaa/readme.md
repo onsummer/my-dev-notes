@@ -55,7 +55,7 @@ const textureView = swapChain.getCurrentTexture().createView()
 const renderPassDescriptor = {
   colorAttachments: [
     {
-      attachment: textureView,
+      view: textureView,
       loadValue: {...}
     }
   ]
@@ -66,7 +66,7 @@ const textureView = swapChain.getCurrentTexture().createView()
 const renderPassDescriptor = {
   colorAttachments: [
     {
-      attachment: msaa_textureView, // 注意此处变化
+      view: msaa_textureView, // 注意此处变化
       resolveTarget: textureView, // 原来交换链的 textureView 被移到了 resolveTarget 项
       loadValue: {...}
     }

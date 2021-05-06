@@ -19,9 +19,9 @@ const vbodata = new Float32Array([
 
 ## 0.2 贴图
 
-一张 256 x 256 的 png 贴图，jpg 和 webp 没测试。
+一张 256 x 256 的 webp 贴图。
 
-![image](texture.png)
+![image](texture.webp)
 
 # 1 纹理与采样器
 

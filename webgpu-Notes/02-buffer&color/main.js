@@ -91,7 +91,7 @@ async function render() {
   const renderPassDescriptor = {
     colorAttachments: [
       {
-        attachment: textureView,
+        view: textureView,
         loadValue: {
           r: 0.0,
           g: 0.0,

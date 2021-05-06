@@ -42,7 +42,7 @@ const device = await adapter.requestDevice()
 const textureView = swapChain.getCurrentTexture().createView()
 const renderPassDescriptor = {
   colorAttachments: [{
-    attachment: textureView,
+    view: textureView,
     loadValue: {
       r: 0.0, g: 0.0, b: 0.0, a: 1.0
     }

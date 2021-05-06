@@ -107,7 +107,7 @@ async function render() {
   const renderPassDescriptor = {
     colorAttachments: [
       {
-        attachment: msaa_textureView,
+        view: msaa_textureView,
         resolveTarget: textureView,
         loadValue: {
           r: 0.0,

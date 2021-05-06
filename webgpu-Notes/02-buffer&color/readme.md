@@ -55,11 +55,6 @@ fn main() -> void {
 ``` wgsl
 [[location(0)]] var<out> fragColor: vec4<f32>;
 [[location(0)]] var<in> in_color: vec4<f32>;
-<<<<<<< HEAD:webgpu-Notes/03-msaa/readme.md
-[[stage(fragment)]]
-=======
->>>>>>> 1962311f5bb545a19aac49748713283a45b21db8:webgpu-Notes/02-buffer&color/readme.md
-
 [[stage(fragment)]]
 fn main() -> void {
 	fragColor = in_color;

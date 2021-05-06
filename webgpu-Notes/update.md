@@ -16,8 +16,8 @@
 
 `GPURenderPassDescriptor` > `GPURenderPassColorAttachment` >
 
-- [属性名更改] `value` -> `view`: `GPUTextureView`
+- [属性名更改] `value` -> `view`: `GPUTextureView` （Edge Canary 92 已更新）
 
 `GPURenderPassDescriptor` > `GPURenderPassDepthStencilAttachment` >
 
-- [属性名更改] `value` -> `view`: `GPUTextureView`
+- [属性名更改] `value` -> `view`: `GPUTextureView` （Edge Canary 92 已更新）

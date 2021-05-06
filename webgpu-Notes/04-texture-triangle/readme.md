@@ -1,5 +1,5 @@
 > 代码见：https://github.com/onsummer/my-dev-notes/tree/master/webgpu-Notes/04-texture-triangle
-> 原创，发布日 2021年4月5日，@秋意正寒。若代码失效请留言，或自行到官网根据最新 API 修改。
+> 原创，发布日 2021年4月5日，更新日 2021年5月6日，@秋意正寒。若代码失效请留言，或自行到官网根据最新 API 修改。
 
 ![image](attachments/image-20210405020042182.png)
 

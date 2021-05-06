@@ -1,4 +1,5 @@
->  代码见：https://github.com/onsummer/my-dev-notes/tree/master/webgpu-Notes/03-msaa
+> 代码见：https://github.com/onsummer/my-dev-notes/tree/master/webgpu-Notes/03-msaa
+> 更新日 2021年5月6日。 
 
 ![image-20210402090820638](attachments/image-20210402090820638.png)
 

@@ -1,5 +1,5 @@
 > 代码见：https://github.com/onsummer/my-dev-notes/tree/master/webgpu-Notes/05-uniform-color
-> 原创，发布日 2021年4月6日，@秋意正寒。若代码失效请留言，或自行到官网根据最新 API 修改。
+> 原创，发布日 2021年4月6日，更新日 2021年5月6日，@秋意正寒。若代码失效请留言，或自行到官网根据最新 API 修改。
 
 # 简介
 

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="137.28mm" height="9.2822mm" fill-rule="evenodd" stroke-linejoin="round" stroke-width="28.222" preserveAspectRatio="xMidYMid" version="1.2" viewBox="0 0 13728 928.22" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"><metadata><rdf:RDF><cc:Work rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/><dc:title/></cc:Work></rdf:RDF></metadata>
+ <defs class="ClipPathGroup"><clipPath id="presentation_clip_path">
+   <rect width="21000" height="29700"/>
+  </clipPath></defs>
+ 
+ 
+ 
+ <g transform="translate(-2685.9 -6185.9)">
+  <g class="Master_Slide">
+   
+   
+  </g>
+ </g>
+ <g class="SlideGroup" transform="translate(-2685.9 -6185.9)">
+  
+   
+    <g class="Slide" clip-path="url(#presentation_clip_path)">
+     <g class="Page">
+      <g class="com.sun.star.drawing.CustomShape">
+       
+        <rect class="BoundingBox" x="2699" y="6199" width="1103" height="903" fill="none"/>
+        <path d="m3250 7100h-550v-900h1100v900z" fill="#729fcf"/>
+        <path d="m3250 7100h-550v-900h1100v900z" fill="none" stroke="#3465a4"/>
+        <text class="TextShape"><tspan class="TextParagraph" font-family="'Liberation Sans', sans-serif" font-size="388px" font-weight="400"><tspan class="TextPosition" x="2958" y="6785"><tspan fill="#000000">MB</tspan></tspan></tspan></text>
+
+       
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       
+        <rect class="BoundingBox" x="3799" y="6199" width="1403" height="903" fill="none"/>
+        <path d="m4500 7100h-700v-900h1400v900z" fill="#0cc"/>
+        <path d="m4500 7100h-700v-900h1400v900z" fill="none" stroke="#3465a4"/>
+        <text class="TextShape"><tspan class="TextParagraph" font-family="'Liberation Sans', sans-serif" font-size="388px" font-weight="400"><tspan class="TextPosition" x="4361" y="6785"><tspan fill="#000000">H</tspan></tspan></tspan></text>
+
+       
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       
+        <rect class="BoundingBox" x="5199" y="6199" width="1903" height="903" fill="none"/>
+        <path d="m6150 7100h-950v-900h1900v900z" fill="#729fcf"/>
+        <path d="m6150 7100h-950v-900h1900v900z" fill="none" stroke="#3465a4"/>
+        <text class="TextShape"><tspan class="TextParagraph" font-family="'Liberation Sans', sans-serif" font-size="388px" font-weight="400"><tspan class="TextPosition" x="6095" y="6785"><tspan fill="#000000">I</tspan></tspan></tspan></text>
+
+       
+      </g>
+      <g class="com.sun.star.drawing.CustomShape">
+       
+        <rect class="BoundingBox" x="7099" y="6199" width="9303" height="903" fill="none"/>
+        <path d="m11750 7100h-4650v-900h9300v900z" fill="#0cc"/>
+        <path d="m11750 7100h-4650v-900h9300v900z" fill="none" stroke="#3465a4"/>
+        <text class="TextShape"><tspan class="TextParagraph" font-family="'Liberation Sans', sans-serif" font-size="388px" font-weight="400"><tspan class="TextPosition" x="11261" y="6785"><tspan fill="#000000">DATA</tspan></tspan></tspan></text>
+
+       
+      </g>
+     </g>
+    </g>
+   
+  
+ </g>
+</svg>

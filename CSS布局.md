@@ -400,7 +400,7 @@ justify-content 的可选值还有
 ``` CSS
 .cell-1 {
   grid-row: 1 / 4; /* 从第一根轴开始，到第4根轴结束 */
-  grid-colume: 2 / 6;
+  grid-column: 2 / 6;
 }
 ```
 
@@ -409,7 +409,7 @@ justify-content 的可选值还有
 ``` CSS
 .cell-1 {
   grid-row: 1 / span 4; /* 从第一根轴开始，横跨4根轴 */
-  grid-colume: 2 / 6;
+  grid-column: 2 / 6;
 }
 ```
 
@@ -418,6 +418,7 @@ justify-content 的可选值还有
 ``` CSS
 .cell-1 {
   grid-area: 1 / 1 / 4 / 3; /* 横轴纵轴 1、1为左上，4、3为右下的范围 */
+  /* 左上横轴 / 左上纵轴 / 右下横轴 / 右下纵轴 */
 }
 ```
 

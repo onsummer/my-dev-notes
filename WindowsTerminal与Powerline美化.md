@@ -19,6 +19,7 @@
   - [Windows 使用 FluentTerminal 搭配 Oh-My-Posh_CSDN](https://blog.csdn.net/yuanlaijike/article/details/88904695) 讲到关闭后失效问题的解决
   - [VSCode配置FiraCode和更纱黑体字体](https://www.cnblogs.com/shenyuelan/p/11963867.html) 讲到更纱黑体应该解压哪一款并附上了下载链接
   - [5 个 PowerShell 主题，让你的 Windows 终端更好看_少数派](https://sspai.com/post/52907)
+  - [告别 Windows 终端的难看难用，从改造 PowerShell 的外观开始 少数派](https://sspai.com/post/52868)
   - [字体点评_知乎](https://zhuanlan.zhihu.com/p/89833093)
 
 ## 字体问题
@@ -352,3 +353,23 @@ Windows Registry Editor Version 5.00
 ```
 
 可执行文件和图标自己网上找，挺多的，写对路径即可
+
+# 9 后记
+
+oh-my-posh 是控制提示文字的样式，官方主题列表：https://ohmyposh.dev/docs/themes
+
+安装方法有两种，scoop 和 winget
+
+``` sh
+scoop install https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/oh-my-posh.json
+winget install JanDeDobbeleer.OhMyPosh
+```
+
+
+
+colortool 是控制颜色主题，通过 scoop 可以安装。
+
+最新的 WindowsTerminal 已经有一些内置的好看的主题了
+
+打开 `Settings.json`，编辑 `schemes` 数组，从 https://github.com/mbadolato/iTerm2-Color-Schemes/tree/master/windowsterminal 这里复制粘贴你想要的进去即可。
+

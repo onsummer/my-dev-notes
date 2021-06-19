@@ -246,7 +246,7 @@ b3dm 瓦片内置的 glTF 模型中，每个 primitive 的 attribute，也即顶
 
 ```json
 {
- 	"POINTS_LENGTH": 20, // <- pnts 中有多少个点，这里有 20 个点
+  "POINTS_LENGTH": 20, // <- pnts 中有多少个点，这里有 20 个点
   /* 其他 pnts 要素表属性，略 */
   "extensions": {
     "3DTILES_draco_point_compression": {

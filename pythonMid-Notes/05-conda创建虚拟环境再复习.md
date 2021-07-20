@@ -51,6 +51,22 @@ conda config --set show_channel_urls yes
 conda config --remove-key channels
 ```
 
+### 显示源
+
+``` sh
+conda config --show-sources
+
+==> C:\Users\C\.condarc <==                                   
+channels:                                                     
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/  
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/  
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free   
+  - defaults                                                  
+show_channel_urls: True                                       
+```
+
+
+
 ## 更新conda自己
 
 ``` SHELL
@@ -80,10 +96,15 @@ conda create -n <虚拟环境名> python=3.7
 如果你想指定虚拟环境的位置：
 
 ``` SHELL
+# 绝对路径
 conda create --preifx=D:\myenvs\test_env python=3.7
+# 相对路径
+conda create --prefix=. python=3.9
 ```
 
-期间，会提示要安装一些基础依赖库，敲 `y` 回车即可。
+期间，会提示是否创建虚拟环境（提示已经存在文件夹，但是并不是 conda 环境）要安装一些基础依赖库（sqlite、pip、setuptools、python本身等等），敲 `y` 回车即可。
+
+> - 如果使用绝对路径，目录不存在，则要提前创建
 
 ### 创建虚拟环境的同时并安装依赖
 
@@ -107,7 +128,9 @@ conda activate D:\myenvs\test_env
 source activate <虚拟环境路径>
 ```
 
-貌似有些情况，Windows可以省略 `conda`，直接 `activate` 就可以激活。
+貌似有些情况，Windows可以省略 `conda`，直接 `activate` 就可以激活。为了保险起见，最好还是加上 `conda`
+
+激活虚拟环境貌似不能使用相对路径。
 
 ### 意外情况
 
@@ -150,6 +173,16 @@ conda deactivate <虚拟环境全路径/虚拟环境名>
 ```
 
 ## ③ 安装依赖、删除依赖、更新依赖、删除虚拟环境
+
+### 查询当前虚拟环境的包
+
+``` sh
+conda list
+# 或
+pip list
+```
+
+
 
 ### 安装依赖到某个虚拟环境
 

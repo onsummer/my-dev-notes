@@ -145,15 +145,78 @@ float rand(const vec2 co) {
 }
 ```
 
-有了这个函数，可以做这样的事情：
+有了这个函数，就可以判断是否需要重置粒子状态了：
 
 ``` glsl
 if (rand(some_numbers) > 0.99) 
-    reset_particle_position();
+  reset_particle_position();
 ```
 
+难点在于，如何让粒子重置的时候重置到一个足够随机的位置。
 
+直接用粒子的坐标是不行的，因为相同的粒子的坐标总是会得到一样的随机数，即在哪儿产生，就在哪儿消失。
+
+最终，作者决定使用三个值作为随机数的输入二维向量：
+
+``` glsl
+vec2 seed = (pos + v_tex_pos) * u_rand_seed;
+```
+
+其中，`pos` 是粒子当前坐标，`v_tex_pos` 是粒子原始坐标，`u_rand_seed` 是每一帧中计算得到的随机值。
+
+仍旧存在一个小问题，那就是粒子的速度非常快的区域看起来会很稠密，可以通过设置一个“重置率”数值来实现整体平衡：
+
+``` glsl
+float dropRate = u_drop_rate + speed_t * u_drop_rate_bump;
+```
+
+其中，`speed_t` 是一个介于区间 `(0, 1)` 之间的相对值，`u_drop_rate` 和 `u_drop_rate_bump` 是自由调节的两个参数。
 
 
 
 # 展望
+
+作者感谢的话。不翻译了。
+
+附赠源代码：https://github.com/mapbox/webgl-wind
+
+
+
+# 代码追踪
+
+## 1. 创建 WindGL 对象
+
+参数只有 `WebGLRenderingContext` 一个，而后这个类有四个用于控制粒子姿态的参数：
+
+- `fadeOpacity`，默认值 0.996，控制上一帧的淡出透明度，会影响粒子速度
+- `speedFactor`，默认值 0.25，控制粒子在 js 代码中的移动速度
+- `dropRate`，默认值 0.003，粒子落到随机位置的概率
+- `dropRateBump`，默认值 0.01，相对于某个粒子本身的速度的掉落率增量
+
+在构造函数里，会创建三个 `WebGLProgram`、一个 `WebGLBuffer`、一个 `WebGLFramebuffer` 和三个 `WebGLTexture`。
+
+当然，`WebGLProgram` 并不是简单的对象，而是包括了 `WebGLProgram`、`WebGLUniformLocation` 和 attribute 位置的一个 js 对象。
+
+| 属性名              | 类型                    | 作用                                                         |
+| ------------------- | ----------------------- | ------------------------------------------------------------ |
+| `drawProgram`       | WebGLProgram + 各种位置 |                                                              |
+| `screenProgram`     | WebGLProgram + 各种位置 |                                                              |
+| `updateProgram`     | WebGLProgram + 各种位置 |                                                              |
+| `quadBuffer`        | WebGLBuffer             | 6个顶点坐标，构成一个正方形：`[[0, 0], [1, 0], [0, 1], [0, 1], [1, 0], [1, 1]]` |
+| `frameBuffer`       | WebGLFramebuffer        |                                                              |
+| `colorRampTexture`  | WebGLTexture            | 一个 16 x 16 的纹理，填充了一个渐变色带的 RGBA 值            |
+| `backgroundTexture` | WebGLTexture            | 一个当前屏幕分辨率（由 canvas.width 和 canvas.height 获取）的 RGBA 纹理，用途： |
+| `screenTexture`     | WebGLTexture            | 一个当前屏幕分辨率（由 canvas.width 和 canvas.height 获取）的 RGBA 纹理，用途： |
+
+创建完成后就随着 rAF 在那里跑了
+
+## 2. 配置GUI
+
+略
+
+## 3. 执行 updateWind(0)
+
+从数组 `windFiles` 中取第一个文件，发起 HTTP 请求，获取 json 文件，然后使用 json 文件中对应的 png 文件名生成 `Image` 对象，并将其赋给 json 的一个属性 `image`。当此 `Image` 对象加载完成后，将请求到的 json 赋给 `WindGL` 对象。
+
+而在 rAF 中，渲染的条件即 `WindGL.prototype.data` 存在。`WindGL` 对象本身就会调取此 json 以及此 image 数据进行绘制。
+

@@ -1,10 +1,8 @@
-我如何使用 WebGL 来创建一个风向地图？
-
 > 翻译：@四季留歌
 >
-> 部分翻译。
+> 部分翻译。原文：https://blog.mapbox.com/how-i-built-a-wind-map-with-webgl-b63022b5537f
 
-# 使用 CPU 进行风向可视化
+# 如果使用 CPU 进行风向可视化
 
 有很多风力可视化在线网站，最出名的莫过于 [earth.nullschool.net](https://earth.nullschool.net/)。它并不是开源的，但是它有一个开源的旧版本，大多数现有方案都基于此实现。
 

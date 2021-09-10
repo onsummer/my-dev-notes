@@ -17,9 +17,9 @@ async function render() {
   const adapter = await navigator.gpu.requestAdapter()
   const device = await adapter.requestDevice()
 
-  const context = canvas.getContext('gpupresent')
+  const context = canvas.getContext('webgpu')
   const swapChainFormat = `bgra8unorm`
-  const swapChain = context.configureSwapChain({
+  context.configure({
     device,
     format: swapChainFormat
   })
@@ -36,15 +36,27 @@ async function render() {
     vertex: {
       module: device.createShaderModule({
         code: `
-        [[builtin(position)]] var<out> out_position: vec4<f32>;
-        [[location(0)]] var<out> out_color: vec4<f32>;
-        [[location(0)]] var<in> in_position_2d: vec2<f32>;
-        [[location(1)]] var<in> in_color_rgba: vec4<f32>;
+        struct PositionColorInput {
+          [[location(0)]] in_position_2d: vec2<f32>;
+          [[location(1)]] in_color_rgba: vec4<f32>;
+        };
+
+        struct PositionColorOutput {
+          [[builtin(position)]] coords_output: vec4<f32>;
+          [[location(0)]] color_output: vec4<f32>;
+        };
+
+        // main 的输入参数除了结构体，还可以是简单的多个参数，例如
+        // fn main([[location(0)]] in_position_2d: vec2<f32>, [[location(1)]] in_color_rgba: vec4<f32>) { /* ... */ }
+        // 但是输出只能是单值，此处要向下一个阶段输出 vbo 中的颜色 attribute，只能使用结构体
+
         [[stage(vertex)]]
-        fn main() -> void {
-          out_position = vec4<f32>(in_position_2d, 0.0, 1.0);
-          out_color = in_color_rgba;
-          return;
+        fn main(input: PositionColorInput) 
+          -> PositionColorOutput {
+          var output: PositionColorOutput;
+          output.color_output = input.in_color_rgba;
+          output.coords_output = vec4<f32>(input.in_position_2d, 0.0, 1.0);
+          return output;
         }
         `
       }),
@@ -65,12 +77,10 @@ async function render() {
     fragment: {
       module: device.createShaderModule({
         code: `
-        [[location(0)]] var<out> outColor: vec4<f32>;
-        [[location(0)]] var<in> in_color: vec4<f32>;
         [[stage(fragment)]]
-        fn main() -> void {
-          outColor = in_color;
-          return;
+        fn main([[location(0)]] in_color: vec4<f32>) 
+          -> [[location(0)]] vec4<f32> {
+          return in_color;
         }
         `
       }),
@@ -87,7 +97,7 @@ async function render() {
   })
 
   const commandEncoder = device.createCommandEncoder()
-  const textureView = swapChain.getCurrentTexture().createView()
+  const textureView = context.getCurrentTexture().createView()
   const renderPassDescriptor = {
     colorAttachments: [
       {

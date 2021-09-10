@@ -1,5 +1,5 @@
 /*
-  2021年5月6日 
+  2021年9月10日 
 */
 
 const canvas = document.getElementById('gpuweb')

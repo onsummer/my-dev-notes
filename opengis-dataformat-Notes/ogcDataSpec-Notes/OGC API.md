@@ -16,7 +16,3 @@ https://ogcapi.ogc.org/#standards
 | DGGS      |      |
 | Routes    |      |
 
-
-
-
-

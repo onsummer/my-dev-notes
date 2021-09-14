@@ -358,6 +358,8 @@ enum GPUTextureFormat {
 
 # 4 为纹理输入图片/视频数据
 
+## 使用 GPUQueue.copyExternalImageToTexture 方法
+
 从外部（也就是 HTMLCanvasElement、HTMLVideoElement、ImageBitmap）中传数据到 `GPUTexture`，可以使用 `GPUQueue.copyExternalImageToTexture` 这个方法，这里使用 ImageBitmap 作示例：
 
 ``` typescript
@@ -402,6 +404,14 @@ dictionary GPUImageCopyExternalImage {
   GPUOrigin2D origin = {};
 };
 ```
+
+## 使用 GPUQueue.writeTexture 方法
+
+这个方法与 GPUQueue.copyExternalImageToTexture 方法略有不同，请读者自行思考二者异同。
+
+---
+
+## 使用 GPUDevice.importExternalTexture 方法
 
 关于视频数据的传递，则需要使用 `device.importExternalTexture` 这个方法，详细请参考：
 

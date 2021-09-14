@@ -50,8 +50,8 @@ namespace GPUTextureUsage {
 
 还有三个可选参数：
 
-- mipLevelCount，类型是 unsigned long，默认值是 1，表示 mipmap 的个数
-- sampleCount，类型是 unsigned long，默认值是 1，表示采样次数，只能是 1 或 4
+- mipLevelCount，类型是 unsigned long，默认值是 1，表示 mipmap 的等级数
+- sampleCount，类型是 unsigned long，默认值是 1，表示采样次数，**只能是 1 或 4**
 - dimension，类型是 `GPUTextureDimension` 枚举，默认值是 `"2d"`，表示纹理的维度，即默认是二维纹理；
 
 GPUTextureDimension 的定义如下：
@@ -63,6 +63,8 @@ enum GPUTextureDimension {
   "3d",
 };
 ```
+
+> 译者注：mipLevelCount 中所提及的 mipmap，即多级纹理，类似金字塔技术，而 mipLevelCount 即多级纹理的有多少级。
 
 ## 举例
 
@@ -188,10 +190,10 @@ enum GPUTextureAspect {
 - 参数 format 即格式，同 GPUTexture；
 - 参数 dimension 与 GPUTexture 的 GPUTextureDimension 不大一样，是 `GPUTextureViewDimension` 类型的，多了几个值；
 - 参数 aspect 是枚举类型 `GPUTextureAspect` 的，指定这个 GPUTextureView 用到纹理对象的哪些方面；
-- 参数 baseMipLevel 为 unsigned long 类型，它指定其 mipmap 的基础等级，默认是 0；
+- 参数 baseMipLevel 为 unsigned long 类型，它指定其 mipmap（多级纹理）的基础等级，默认是 0；
 - 参数 mipLevelCount 为 unsigned long 类型，它与 GPUTexture 的 mipLevelCount 意义相同；
-- 参数 baseArrayLayer 为 unsigned long 类型，它默认值是 0，译者表示其意义暂不明确；
-- 参数 arrayLayerCount 为 unsigned long 类型，意义暂不明确。
+- 参数 baseArrayLayer 为 unsigned long 类型，它默认值是 0；
+- 参数 arrayLayerCount 为 unsigned long 类型。
 
 ## 创建时参数不合法的情况
 
@@ -396,7 +398,7 @@ let texture: GPUTexture;
 
 [WebGPU Spec 12.3.5 GPUImageCopyExternalImage](https://www.w3.org/TR/webgpu/#gpu-image-copy-external-image)
 
-[WebGPU Spec 17 Queue createExternalImageToTexture](https://www.w3.org/TR/webgpu/#dom-gpuqueue-copyexternalimagetotexture)
+[WebGPU Spec 17 Queue copyExternalImageToTexture](https://www.w3.org/TR/webgpu/#dom-gpuqueue-copyexternalimagetotexture)
 
 ``` web-idl
 dictionary GPUImageCopyExternalImage {
@@ -418,6 +420,17 @@ dictionary GPUImageCopyExternalImage {
 [WebGPU Spec 4.5 GPUDevice importExternalTexture](https://www.w3.org/TR/webgpu/#gpudevice)
 
 [WebGPU Spec 6.4.1 Import External Textures](https://www.w3.org/TR/webgpu/#external-texture-creation) 
+
+## 译者注
+
+在使用上述导入数据到纹理的方法时，需要格外注意纹理的 usage，在这些方法的文档中应该都有详尽的说明。譬如，`GPUQueue.copyExternalImageToTexture` 这个方法，就指明了纹理的用途必须是 `RENDER_ATTACHMENT` 与 `COPY_DST` 的合并：
+
+``` js
+const texture = device.createTexture({
+	/* ... */,
+	usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_DST
+})
+```
 
 
 

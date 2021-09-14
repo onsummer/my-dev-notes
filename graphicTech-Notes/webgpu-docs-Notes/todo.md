@@ -1,23 +1,3 @@
-GPUFundamentals
-
-GPUBuffer
-
-GPUTexture
-
-GPUResourceBinding
-
-GPUShaderModule
-
-GPUPipeline
-
-GPUCommandEncoder
-
-GPUProgrammablePasses - { GPUComputePass GPURenderPass } eq. WebGLFramebuffer
-
-CanvasRendering
-
-细节操作 - { 转移；计算；渲染: { 渲染管线的细节 } }
-
 ---
 
 WebGL 和 WebGPU 的类比

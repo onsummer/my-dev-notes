@@ -179,13 +179,211 @@ entries: [
 
 # 3 资源绑定组的布局 GPUBindGroupLayout
 
+一个资源绑定组的布局对象，是 `GPUBindGroupLayout` 类型，简称绑定组的布局（对象），它的作用是联系与它配套的绑定组和对应阶段的着色器，告诉管线在什么着色阶段传入的数据长什么样子，是何种类。
 
+``` web-idl
+[Exposed=(Window, DedicatedWorker), SecureContext]
+interface GPUBindGroupLayout {
+};
+GPUBindGroupLayout includes GPUObjectBase;
+```
 
 ## 如何创建
 
+调用设备对象的 `createBindGroupLayout` 方法，即可创建一个绑定组布局对象。
+
+此方法需要一个参数对象，需符合 `GPUBindGroupLayoutDescriptor` 类型：
+
+```web-idl
+dictionary GPUBindGroupLayoutDescriptor : GPUObjectDescriptorBase {
+	required sequence<GPUBindGroupLayoutEntry> entries;
+};
+```
+
+它只有一个必选成员 `entries`，是一个数组，数组的每个元素是 `GPUBindGroupLayoutEntry` 类型的对象。
+
+### GPUBindGroupLayoutEntry 类型
+
+`GPUBindGroupLayoutEntry` 描述一个在着色器中能被访问到的资源长什么样子，且如何找到它。
+
+``` web-idl
+typedef [EnforceRange] unsigned long GPUShaderStageFlags;
+[Exposed=(Window, DedicatedWorker)]
+namespace GPUShaderStage {
+  const GPUFlagsConstant VERTEX   = 0x1;
+  const GPUFlagsConstant FRAGMENT = 0x2;
+  const GPUFlagsConstant COMPUTE  = 0x4;
+};
+
+dictionary GPUBindGroupLayoutEntry {
+  required GPUIndex32 binding;
+  required GPUShaderStageFlags visibility;
+
+  GPUBufferBindingLayout buffer;
+  GPUSamplerBindingLayout sampler;
+  GPUTextureBindingLayout texture;
+  GPUStorageTextureBindingLayout storageTexture;
+  GPUExternalTextureBindingLayout externalTexture;
+};
+```
+
+可见，`GPUBindGroupLayoutEntry` 接受两个必选参数：
+
+- 参数 `binding`，unsigned long 类型的数字，指定该 entry（也即资源）绑定号，绑定号在一个绑定组布局对象的 entries 数组所有元素中是唯一的，且必须和绑定组中的 entry 有对应，以便于在 WGSL 代码中访问对应资源；
+- 参数 `visibility`，`GPUShaderStageFlags` 类型，需从 `GPUShaderStage` 中访问枚举值，表示该 entry 在什么着色阶段可见，例如指定 `visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT`，就意味着这个 entry 所描述的资源在顶点着色阶段和偏远着色阶段均可见。最后一个 `COMPUTE` 是计算管线的计算阶段。
+
+还必须接受一个键值对作为此 entry 描述的资源的信息对象，需从 `buffer`、`sampler`、`texture`、`storageTexture` 和 `externalTexture` 中选一个。
+
+### 描述缓存对象：GPUBufferBindingLayout
+
+``` web-idl
+enum GPUBufferBindingType {
+  "uniform",
+  "storage",
+  "read-only-storage",
+};
+
+dictionary GPUBufferBindingLayout {
+  GPUBufferBindingType type = "uniform";
+  boolean hasDynamicOffset = false;
+  GPUSize64 minBindingSize = 0;
+};
+```
+
+绑定组传递的 GPUBuffer 只有两种，UBO（即 `"uniform"` 类型的 GPUBuffer）和存储型 GPUBuffer，其中后者又分存储型（`"storage"`）和只读存储型（`"read-only-storage"`）两小种，通过 `type` 字段标识，默认值是 "uniform"，type 字段只能是 GPUBufferBindingType 枚举中的一个。
+
+`hasDynamicOffset` 表示缓存对象是否有动态偏移值，默认是 false；
+
+`minBindingSize` 表示的是被绑定的缓存对象的最小绑定大小，默认是 0（byte）；
+
+因为 type 的默认值是 "uniform"，所以如果你准备创建一个绑定组，并考虑到有 ubo 的传递，那么其实可以对某个 entry 简写成：
+
+``` js
+const layout = device.createBindGroupLayout({
+  entries: [
+    {
+      binding: 0,
+      visibility: GPUShaderStage.VERTEX,
+      buffer: {} // <- UBO 的简写
+    }
+  ]
+})
+```
 
 
-## 创建要遵守的规则
+
+### 描述采样器对象：GPUSamplerBindingLayout
+
+``` web-idl
+enum GPUSamplerBindingType {
+  "filtering",
+  "non-filtering",
+  "comparison",
+};
+
+dictionary GPUSamplerBindingLayout {
+	GPUSamplerBindingType type = "filtering";
+};
+```
+
+绑定组布局对象中，用于描述对应绑定组中的采样器资源时用的是 `GPUSamplerBindingLayout` 对象，它只有一个 `type` 字段，其类型是枚举类型 `GPUSamplerBindingType`，默认值是 `"filtering"`。
+
+它用来指示采样器的类型：过滤型、非过滤型和比较型。
+
+
+
+### 描述纹理对象：GPUTextureBindingLayout
+
+``` web-idl
+enum GPUTextureSampleType {
+  "float",
+  "unfilterable-float",
+  "depth",
+  "sint",
+  "uint",
+};
+
+dictionary GPUTextureBindingLayout {
+  GPUTextureSampleType sampleType = "float";
+  GPUTextureViewDimension viewDimension = "2d";
+  boolean multisampled = false;
+};
+```
+
+纹理对象（或者说其纹理视图对象，因为绑定组构造所需的是纹理视图对象）在绑定组的布局对象中以 `GPUTextureBindingLayout` 类型的 entry 表示，有三个参数：
+
+- `samplerType`，是枚举类型 `GPUTextureSampleType` 的字段，默认值是 `"float"`，表示采样类型，有浮点、有符号/无符号整数、非过滤浮点、深度等几个可选项；
+- `viewDimension`，是枚举类型 `GPUTextureViewDimension` 的字段，默认值是 `"2d"`，即默认绑定组中对应 binding 号的纹理视图 entry 所绑定的纹理视图资源是二维的；
+- `multisampled`，布尔值，默认值是 false，表示绑定组中对应 entry 所绑定的纹理视图资源是否需要多重采样。
+
+
+
+### 描述存储型纹理对象：GPUStorageTextureBindingLayout
+
+``` web-idl
+enum GPUStorageTextureAccess {
+	"write-only",
+};
+
+dictionary GPUStorageTextureBindingLayout {
+  GPUStorageTextureAccess access = "write-only";
+  required GPUTextureFormat format;
+  GPUTextureViewDimension viewDimension = "2d";
+};
+```
+
+存储型纹理对象在绑定组的布局对象中以 `GPUStorageTextureBindingLayout` 类型的 entry 表示，有一个必选参数：
+
+- `format`，类型是 `GPUTextureFormat` 枚举，不展开，如有需要请查阅纹理章节；
+
+还有两个其他的参数：
+
+- `access`，`GPUStorageTextureAccess` 枚举类型，默认值是 `"write-only"`，目前只能是只写类型（笔者注：不清楚为何这样设计），表示存储型纹理的可访问性；
+- `viewDimension`，`GPUTextureViewDimension` 枚举类型，默认值是 `"2d"`，用于描述纹理视图对象（对应的纹理对象）的维度，默认是二维纹理
+
+
+
+### 描述外部纹理对象：GPUExternalTextureBindingLayout
+
+``` web-idl
+dictionary GPUExternalTextureBindingLayout {
+};
+```
+
+若需要传递外部纹理对象（视频类的纹理），则需要用到此对象。
+
+它不需要参数，如果绑定组中存在 `GPUExternalTexture`，只需在此绑定组布局中写一个 entry，其 `externalTexture` 键指定一个空对象即可。
+
+
+
+## GPUBindGroupLayoutDescriptor 的正确用法
+
+- entries 数组中每个 entry 的 binding 是唯一的；
+- 每个 entry 必须符合设备对象的功能限制列表中有关的参数项；
+
+对于每个 entry，不妨设 buffer 型的 `entry.buffer` 对象名称为 `bufferLayout`，同理 sampler、texture、storage 的 entry 也有 `samplerLayout`、`textureLayout`、`storageTextureLayout`：
+
+- `bufferLayout`、`samplerLayout`、`textureLayout`、`storageTextureLayout` 不是 undefined
+- 若 entry.visibility 是 `VERTEX`：
+  - bufferLayout.type 不能是 "storage"
+  - storageTextureLayout.access 不能是 "write-only" （似乎此处有问题，待官方更新标准文档）
+- 若 entry 是 texture 类型的，即 textureLayout 不是 undefined，且 textureLayout.multisampled 是 true：
+  - textureLayout.viewDimension 必须是 "2d"
+  - textureLayout.sampleType 不能是 "float" 和 "depth"
+- 若 entry 是 storageTexture 类型的：
+  - storageTextureLayout.viewDimension 不能是 "cube" 和 "cube-array"
+  - storageTextureLayout.format 必须是存储型的格式
+
+## 绑定组布局对象之间的比较：绑定组布局的等价
+
+当下列条件满足时，两个 GPUBindGroupLayout 对象可视作等价：
+
+- 内部属性 `exclusivePipeline` 一致（这个在 js 中看不到）
+- 对于任意 entry 的 binding 值，下列二者满足一个：
+  - 布局对象的内部属性 `"entryMap"` 中都没有此 binding 值
+  - 布局对象的内部属性 `"entryMap"` 中两个 binding 值相等
+
+如果两个绑定组等价，那么它们能调配的资源其实是一样的。
 
 
 

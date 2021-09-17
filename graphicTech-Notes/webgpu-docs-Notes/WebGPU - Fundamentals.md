@@ -1,8 +1,8 @@
-WebGPU 基本概念节选翻译
+WebGPU 基本概念节选翻译，选自 [WebGPU Spec 3 Fundamentals](https://www.w3.org/TR/webgpu/#fundamentals)，本文列举一部分简单的内容，其余内容以后单独拉出去和其他资料一起谈。
 
 # 1 公共约定
 
-节选自 [3.1 Conventions](https://www.w3.org/TR/webgpu/#api-conventions)
+节选自 [WebGPU Spec 3.1 Conventions](https://www.w3.org/TR/webgpu/#api-conventions)
 
 ## ① WebGPU 接口
 
@@ -32,7 +32,7 @@ dictionary GPUObjectDescriptorBase {
 
 # 2 坐标系统
 
-节选自 [3.3 Coordinate Systems](https://www.w3.org/TR/webgpu/#coordinate-systems)
+节选自 [WebGPU Spec 3.3 Coordinate Systems](https://www.w3.org/TR/webgpu/#coordinate-systems)
 
 - 在 NDC 中，Y轴朝上。NDC的点 `(-1.0, -1.0)` 位于 NDC 的左下角。NDC的 X 和 Y 的最大最小值为 1 和 -1，Z 的取值范围是 `[0, 1]`。NDC 中超出此范围的点会被剪裁。
 - 在 Framebuffer、视口坐标系和 Fragment/像素坐标系中 Y轴朝下。原点 `(0, 0)` 位于这几个坐标系的左上角。
@@ -45,7 +45,7 @@ WebGPU 的坐标系和 DirectX 坐标系匹配。
 
 # 3 核心对象
 
-节选自 [3.5 Core Internal Objects](https://www.w3.org/TR/webgpu/#core-internal-objects)
+节选自 [WebGPU Spec 3.5 Core Internal Objects](https://www.w3.org/TR/webgpu/#core-internal-objects)
 
 ## Adapter（适配器）
 
@@ -71,7 +71,7 @@ WebGPU 的坐标系和 DirectX 坐标系匹配。
 
 # 4 WebGPU 的功能列表及其最大限制
 
-节选自 [3.6 Optional Capabilities](https://www.w3.org/TR/webgpu/#optional-capabilities)
+节选自 [WebGPU Spec 3.6 Optional Capabilities](https://www.w3.org/TR/webgpu/#optional-capabilities)
 
 ## 4.2 功能
 
@@ -226,7 +226,7 @@ interface GPUSupportedLimits {
 
 `GPUSupportedFeatures` 即 `device.features` 和 `adapter.features` 对象所实现的接口。
 
-这个对象不是普通的 JavaScript 对象，而是类似 ES6 中 `Set` 一样的集合，你可以使用 `has` 方法来查看有什么功能。它只能添加 `GPUFeatureName` （定义在 [4.4.1.1 GPUFeatureName](https://www.w3.org/TR/webgpu/#enumdef-gpufeaturename)）枚举中的值。
+这个对象不是普通的 JavaScript 对象，而是类似 ES6 中 `Set` 一样的集合，你可以使用 `has` 方法来查看有什么功能。它只能添加 `GPUFeatureName` （定义在 [WebGPU Spec 4.4.1.1 GPUFeatureName](https://www.w3.org/TR/webgpu/#enumdef-gpufeaturename)）枚举中的值。
 
 ``` web-idl
 [Exposed=(Window, DedicatedWorker)]

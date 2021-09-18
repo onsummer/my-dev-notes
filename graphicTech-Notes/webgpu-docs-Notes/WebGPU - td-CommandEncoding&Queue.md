@@ -10,6 +10,8 @@
 
 指令编码器用完就得扔，一次性用品。
 
+https://developer.apple.com/documentation/metal/mtlcommandencoder
+
 ## 如何创建
 
 
@@ -35,3 +37,5 @@ copyBufferToTexture、copyTextureToBuffer、copyTextureToTexture 方法，用于
 除了挨个执行指令缓存器上的指令外，队列对象本身还可以自己就执行一些操作，例如写纹理 writeTexture、写缓存 writeBuffer、从外部图像写数据到纹理 copyExternalImageToTexture 等操作。
 
 其中，writeTexture 方法需要额外用到 GPUImageCopyTexture、GPUImageDataLayout、GPUExtent3D 类型，copyExternalImageToTexture 需要用到 GPUImageCopyExternalImage、GPUImageCopyTextureTagged 和 GPUExtent3D 类型。
+
+https://colin19941.gitbooks.io/metal-programming-guide-zh/content/Command_Organization_and_Execution_Model.html

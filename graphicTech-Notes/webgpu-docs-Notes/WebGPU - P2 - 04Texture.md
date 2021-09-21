@@ -29,11 +29,11 @@ dictionary GPUTextureDescriptor : GPUObjectDescriptorBase {
 
 有三个必选参数：
 
-- size: `GPUExtent3D` 类型，表示
+- `size`: `GPUExtent3D` 类型，表示
   - `GPUExtent3D` 类型
-- format: `GPUTextureFormat` 类型，即纹理的格式；
+- `format`: `GPUTextureFormat` 类型，即纹理的格式；
   - `GPUTextureFormat` 是一个比较大的部分，见本文中的后面部分介绍 [纹理格式](#3 纹理格式 GPUTextureFormat)
-- usage: `GPUTextureUsageFlags` 类型，即纹理的用途；
+- `usage`: `GPUTextureUsageFlags` 类型，即纹理的用途；
   - `GPUTextureUsage` 是一个枚举类型，有 5 个可选值 `COPY_SRC`、`COPY_DST`、`TEXTURE_BINDING`、`STORAGE_BINDING` 和  `RENDER_ATTACHMENT`，分别代表十六进制值 `0x01`、`0x02`、`0x04`、`0x08` 和 `0x10`：
 
 ``` web-idl
@@ -50,9 +50,9 @@ namespace GPUTextureUsage {
 
 还有三个可选参数：
 
-- mipLevelCount，类型是 unsigned long，默认值是 1，表示 mipmap 的等级数
-- sampleCount，类型是 unsigned long，默认值是 1，表示采样次数，**只能是 1 或 4**
-- dimension，类型是 `GPUTextureDimension` 枚举，默认值是 `"2d"`，表示纹理的维度，即默认是二维纹理；
+- `mipLevelCount`，类型是 unsigned long，默认值是 1，表示 mipmap 的等级数
+- `sampleCount`，类型是 unsigned long，默认值是 1，表示采样次数，**只能是 1 或 4**
+- `dimension`，类型是 `GPUTextureDimension` 枚举，默认值是 `"2d"`，表示纹理的维度，即默认是二维纹理；
 
 GPUTextureDimension 的定义如下：
 

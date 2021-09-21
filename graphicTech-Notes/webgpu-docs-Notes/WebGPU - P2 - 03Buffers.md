@@ -27,7 +27,7 @@ GPUBuffer 对象是可以被序列化的。
 
 # 1 创建
 
-创建一个 GPUBuffer 需要用到 GPUBufferDescriptor 接口类型的对象。
+创建一个 GPUBuffer 需要用到 `GPUBufferDescriptor` 类型的对象。
 
 ``` web-idl
 dictionary GPUBufferDescriptor : GPUObjectDescriptorBase {
@@ -43,23 +43,26 @@ dictionary GPUBufferDescriptor : GPUObjectDescriptorBase {
 
 - 如果 descriptor.usage 不在设备对象允许的用途之内，也无效；
 
-- 如果 descriptor.usage 被同时设为 `MAP_READ` 和 `MAP_WRITE`，无效（即一个 GPUBuffer 不能同时用于映射独写）
+- 如果 descriptor.usage 被同时设为 `MAP_READ` 和 `MAP_WRITE`，无效（即一个 GPUBuffer 不能同时用于映射独写）；
 
-- 如果 descriptor.usage 被设为 `MAP_READ`，那么联合的用法只能是 `COPY_DST`
+- 如果 descriptor.usage 被设为 `MAP_READ`，那么联合的用法只能是 `COPY_DST`；
 
-- 如果 descriptor.usage 被设为 `MAP_WRITE`，那么联合的用法只能是 `COPY_SRC`
+- 如果 descriptor.usage 被设为 `MAP_WRITE`，那么联合的用法只能是 `COPY_SRC`；
 
-- 如果 descriptor.mappedAtCreation 被设为 `true`，那么 descriptor.size 必须是 4 的倍数
+- 如果 descriptor.mappedAtCreation 被设为 `true`，那么 descriptor.size 必须是 4 的倍数。
 
   
 
-  注意，descriptor.usage 既不是 `MAP_READ` 也不是 `MAP_WRITE` 时，将 descriptor.mappedAtCreation 设为 `true` 是可以的。
+注意，descriptor.usage 既不是 `MAP_READ` 也不是 `MAP_WRITE` 时，将 descriptor.mappedAtCreation 设为 `true` 是可以的。
 
-  descriptor 的 size 属性指定了需要申请多大的显存，单位是字节。
+descriptor 的 size 属性指定了需要申请多大的显存，单位是 byte。
+
+
+
 
 ## GPUBuffer 的用途
 
-使用枚举 `GPUBufferUsage` 来标识 GPUBuffer 对象的用途。
+使用 `GPUBufferUsage` 来标识 GPUBuffer 对象的用途。
 
 ``` web-idl
 typedef [EnforceRange] unsigned long GPUBufferUsageFlags;
@@ -84,7 +87,7 @@ namespace GPUBufferUsage {
 
 # 2 缓存映射
 
-JavaScript 端可以对 GPUBuffer 对象进行映射操作，然后才能访问对应的显存。一旦 GPUBuffer 对象被映射，就可以调用其 `getMappedRange` 获取可被操作的显存，以 ArrayBuffer 表示。
+JavaScript 可以对 GPUBuffer 对象进行映射操作，然后才能访问对应的显存。一旦 GPUBuffer 对象被映射，就可以调用其 `getMappedRange` 方法获取可被操作的显存，以 ArrayBuffer 表示。
 
 进入映射状态的 GPUBuffer 对象所申请的那块显存不能被 GPU 使用，必须在提交给队列之前调用其 `unmap` 方法解除映射。
 
@@ -105,11 +108,11 @@ namespace GPUMapMode {
 
 它有三个参数：
 
-- mode，`GPUMapMode` 类型，表示映射之后用来干什么，这个是必选参数
-- offset，unsigned longlong 类型，表示从哪里开始映射，字节数量，默认是 0，必须是 8 的倍数
-- size，unsigned longlong 类型，表示映射多少大小，字节数量，默认是 GPUBuffer 申请显存的大小减去 offset 的差，必须是 4 的倍数
+- `mode`，`GPUMapMode` 类型，表示映射之后用来干什么，这个是必选参数
+- `offset`，unsigned longlong 类型，表示从哪里开始映射，字节数量，默认是 0，必须是 8 的倍数
+- `size`，unsigned longlong 类型，表示映射多少大小，字节数量，默认是 GPUBuffer 申请显存的大小减去 offset 的差，必须是 4 的倍数
 
-注意，mode 要与 GPUBuffer 的 usage 一致且只能二选一，且调用此方法之前 GPUBuffer 的状态得是未映射的。
+注意，mode 要与 GPUBuffer 的 usage 一致且只能二选一，且调用此方法之前 GPUBuffer 要未映射。
 
 
 
@@ -119,8 +122,8 @@ namespace GPUMapMode {
 
 它有两个参数：
 
-- offset，可选参数，表示从申请的显存的哪个字节开始获取，如果不给就是 0；必须是 8 的倍数且不超申请的大小；
-- size，可选参数，表示要多长，如果不给就是申请的显存的最大值减去 offset 的差；是 4 的倍数。
+- `offset`，可选参数，表示从申请的显存的哪个字节开始获取，如果不给就是 0；必须是 8 的倍数且不超申请的大小；
+- `size`，可选参数，表示要多长，如果不给就是申请的显存的最大值减去 offset 的差；是 4 的倍数。
 
 注意，这个方法要在 GPUBuffer 映射的时候才能用。
 
@@ -134,7 +137,7 @@ namespace GPUMapMode {
 
 
 
-关于为什么要显存的映射/取消映射，后续会出专门的一篇文章介绍。
+关于为什么要显存的映射/取消映射，以后会出专门的一篇文章介绍。
 
 
 
@@ -313,9 +316,9 @@ undefined writeBuffer(
 
 不同点：
 
-- writeBuffer 是使用 ArrayBuffer 或 ArrayBufferLike（TypedArray等）作为数据源，且要求 GPUBuffer 是映射的，必须是 `COPY_DST`
-- copyBufferToBuffer 是 GPUBuffer 之间的复制，需要 `COPY_DST` 和 `COPY_SRC` 类型的 GPUBuffer
-- writeBuffer 方法是队列上开启一个“任务”，而 copyBufferToBuffer 是指令编码器的一个操作，要比 writeBuffer 低一个级别；直接操作映射后的 ArrayBuffer 则是直接操作的显存，并不在渲染器设计的范畴中
+- writeBuffer 是使用 ArrayBuffer 或 ArrayBufferLike（TypedArray等）作为数据源，且要求 GPUBuffer 是映射的，必须是 `COPY_DST`；
+- copyBufferToBuffer 是 GPUBuffer 之间的复制，需要 `COPY_DST` 和 `COPY_SRC` 类型的 GPUBuffer；
+- writeBuffer 方法是队列上开启一个“任务”，而 copyBufferToBuffer 是指令编码器的一个操作，要比 writeBuffer 低一个级别。
 
-写数据还有个直接对映射的 ArrayBuffer 进行写入的方法，这里就留给读者自己思考吧。
+写数据，还有个直接对映射的 ArrayBuffer 进行写入的途径，就留给读者自己思考与上面二者的异同吧。
 

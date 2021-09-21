@@ -87,7 +87,7 @@ async function render() {
   //   ]
   // )
 
-  device.queue.copyImageBitmapToTexture({
+  device.queue.copyExternalImageToTexture({
     imageBitmap: imageBitmap
   }, {
     texture: texture

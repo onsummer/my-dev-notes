@@ -1,12 +1,29 @@
 # VertexBuffer 的创建
 
-VertexBuffer 的本体就是一个 `GPUBuffer`，主要就是指定其 usage，以及在创建 ShaderModule 时配置好 VertexAttribute，上代码：
+VertexBuffer 的本体就是一个 `GPUBuffer`，主要就是指定其 usage，以及在创建 ShaderModule 时配置好 VertexAttribute。
+
+顶点属性，所谓的 VertexAttribute，在 VertexBuffer 中的排列是顶点顺序优先。比如在某个 VertexBuffer 中，一个顶点拥有 f32 二维坐标属性、f32 RGBA颜色属性，那么它大概长这样：
+
+```
+顺次排列
+↓ 顶点1（24 bytes）
+		 坐标x 坐标y
+		 R分量 G分量 B分量 A分量
+↓ 顶点2（24 bytes）
+     坐标x 坐标y
+ 		 R分量 G分量 B分量 A分量
+↓ 
+...
+```
+
+上代码：
 
 ``` js
 const vbodata = new Float32Array([
-  -0.5, 0.0, 1.0, 0.0, 0.0, 1.0,
-  0.0, 0.5, 0.0, 1.0, 0.0, 1.0,
-  0.5, 0.0, 0.0, 0.0, 1.0, 1.0
+  // 坐标 xy      // 颜色 RGBA
+  -0.5, 0.0,     1.0, 0.0, 0.0, 1.0, // ← 顶点 1
+  0.0, 0.5,      0.0, 1.0, 0.0, 1.0, // ← 顶点 2
+  0.5, 0.0,      0.0, 0.0, 1.0, 1.0  // ← 顶点 3
 ])
 const vbo = device.createBuffer({
   size: vbodata.byteLength,
@@ -41,7 +58,7 @@ const vsShaderModule = device.createShaderModule({
 
 与 GLSL 略有不同，当新语法学习即可。
 
-WGLS 中现在使用结构体作为输入输出。
+WGSL 中现在可以使用结构体作为入口点函数的输入输出，当然也可以只用插槽，见代码中的注释。
 
 ``` wgsl
 /* 顶点着色器阶段 */

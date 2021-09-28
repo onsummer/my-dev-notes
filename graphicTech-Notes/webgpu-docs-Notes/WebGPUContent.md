@@ -54,7 +54,7 @@ WebGPU 在娘胎里就设计好了，它有两大功能：绘图和通用计算�
 
 基础概念部分
 
-- [WebGPU 规范篇 01 基础](./WebGPU - P2 - 01Fundamentals.md)
+- [WebGPU 规范篇 01 规范基础](./WebGPU - P2 - 01Fundamentals.md)
 - [WebGPU 规范篇 02 对象初始化](./WebGPU - P2 - 02Initialization.md)
 
 数据资源部分

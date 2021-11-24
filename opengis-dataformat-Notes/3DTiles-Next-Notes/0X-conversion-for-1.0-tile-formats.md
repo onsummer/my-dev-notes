@@ -1,0 +1,1 @@
+https://github.com/CesiumGS/3d-tiles/blob/main/extensions/3DTILES_content_gltf/MIGRATION_GUIDE.md

@@ -78,7 +78,9 @@
 
 上面这份数据就表示，root 瓦片的内容文件 `trees.gltf` 模型，用到了 glTF 规范中的 `EXT_mesh_gpu_instancing` 扩展，而且必需要用到这个扩展。
 
-# 附：3DTILES_content_gltf 模式定义
+
+
+# 附 3DTILES_content_gltf 模式定义
 
 ``` json
 {

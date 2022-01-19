@@ -14,7 +14,7 @@
 
 # 可选与必需
 
-如果瓦片分割规则用到了隐式分割，那么这项扩展必须同时出现在 `extensionsUsed` 和 `extensionsRequired` 数组中，即“必需的”。
+如果瓦片在空间索引规则上用到了隐式分割，那么这项扩展必须同时出现在 `extensionsUsed` 和 `extensionsRequired` 数组中，即“必需的”。
 
 # 1. 概述
 
@@ -77,7 +77,7 @@ Implicit tiling，译作 **隐式瓦片分割**，是一种 3D Tileset 的新的
 }
 ```
 
-理论上来说，有隐式分割扩展的瓦片对象不需要，也没必要存在 `boundingVolume`（空间范围体）属性，是因为隐式瓦片的分割规则已经可以通过瓦片索引坐标计算出这个属性。这里的 root 瓦片之所以存在这个属性是因为 [3DTILES_metadata](./04-3DTILES_metadata.md) 扩展某些元数据定义需要用到这个属性，例如 [CONTENT_BOUNDING_BOX]() 之类的。
+理论上来说，有隐式分割扩展的瓦片对象不需要，也没必要存在 `boundingVolume`（空间范围长方体）属性，是因为隐式瓦片的分割规则已经可以通过瓦片索引坐标计算出这个属性。这里的 root 瓦片之所以存在这个属性是因为 [3DTILES_metadata](./04-3DTILES_metadata.md) 扩展某些元数据定义需要用到这个属性，例如 [CONTENT_BOUNDING_BOX]() 之类的。
 
 另外，隐式分割瓦片的 `content.uri` 属性不可以引用 [External Tileset]()（扩展瓦片集）。
 
@@ -96,13 +96,13 @@ Tile.extension.3DTILES_implicit_tiling 对象，其属性规定如下：
 
 # 3. 空间分割方式
 
-空间分割方式，是一种对空间的递归分割方式，它将某个空间范围分割成等体积的若干个子空间。
+空间分割方式，是一种对空间的递归分割方式，它将某个空间范围长方体分割成等体积的若干个子空间。
 
 具体来说，可以根据维度来均匀分割，例如对 x 和 y 轴的维度进行分割，那么就能分出 4 块子空间，这种分割叫四叉树分割；同理，对 x、y、z 三轴分割空间，得到 8 个子空间，则叫做八叉树分割。
 
 对分割出来的子空间依旧遵循上一级的分割方式，继续分割。
 
-对于 `region` 型的空间范围体，其 x、y、z 维度分别代表经度方向、纬度方向、高度方向。
+对于 `region` 型的空间范围长方体，其 x、y、z 维度分别代表经度方向、纬度方向、高度方向。
 
 **四叉树（quadtree）分割**只分割 x 和 y 维度，每个方向取原空间范围的一半长作为子空间的大小。四叉树分割中的 z 维度是不变的，如下图所示（平面示意）：
 
@@ -112,7 +112,7 @@ Tile.extension.3DTILES_implicit_tiling 对象，其属性规定如下：
 
 ![Octree](attachments/octree.png)
 
-下面图例详细说明了 3D Tiles 中受支持的几种空间范围体的分割方式：
+下面图例详细说明了 3D Tiles 中受支持的几种空间范围长方体的分割方式：
 
 - `box` 类型
 
@@ -124,7 +124,7 @@ Tile.extension.3DTILES_implicit_tiling 对象，其属性规定如下：
 
 | 原 region                                                    | 四叉树分割后                                                 | 八叉树分割后                                                 |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| <img src="https://github.com/CesiumGS/3d-tiles/raw/main/extensions/3DTILES_implicit_tiling/figures/region.png" alt="Root region" style="zoom:33%;" /> | <img src="https://github.com/CesiumGS/3d-tiles/raw/main/extensions/3DTILES_implicit_tiling/figures/region-quadtree.png" alt="Region Quadtree" style="zoom:33%;" /> | <img src="https://github.com/CesiumGS/3d-tiles/raw/main/extensions/3DTILES_implicit_tiling/figures/region-octree.png" alt="Region octree" style="zoom:33%;" /> |
+| <img src="attachments/region.png" alt="Root region" style="zoom:33%;" /> | <img src="attachments/region-quadtree.png" alt="Region Quadtree" style="zoom:33%;" /> | <img src="attachments/region-octree.png" alt="Region octree" style="zoom:33%;" /> |
 
 `sphere` 类型不支持，因为它不能做递归四叉树或者八叉树分割。
 
@@ -132,22 +132,36 @@ Tile.extension.3DTILES_implicit_tiling 对象，其属性规定如下：
 
 ## 分割规则
 
-使用隐式分割扩展的瓦片，只需在根瓦片定义其 `subdivisionScheme`（分割方式）、`refine`（细化策略）、`boundingVolume`（空间范围体）、`geometricError`（几何误差）即可，子瓦片均可根据瓦片的索引坐标计算得到自己的这些值，遵循如下计算规则：
+使用隐式分割扩展的瓦片，只需在根瓦片定义其 `subdivisionScheme`（分割方式）、`refine`（细化策略）、`boundingVolume`（空间范围长方体）、`geometricError`（几何误差）即可，子瓦片均可根据瓦片的索引坐标计算得到自己的这些值，遵循如下计算规则：
 
 | 属性                | 规则                                                         |
 | ------------------- | ------------------------------------------------------------ |
-| `subdivisionScheme` | 继承根瓦片                                                   |
-| `refine`            | 继承根瓦片                                                   |
-| `boundingVolume`    | 如果 `subdivisionScheme` 是 `QUADTREE`，那么父瓦片对应的空间范围体在 x、 y 方向上一分为四即子瓦片此属性的值；是 `QUADTREE` 则一分为八 |
+| `subdivisionScheme` | 与根瓦片一致                                                 |
+| `refine`            | 与根瓦片一致                                                 |
+| `boundingVolume`    | 如果 `subdivisionScheme` 是 `QUADTREE`，那么父瓦片对应的空间范围长方体在 x、 y 方向上一分为四即子瓦片此属性的值；是 `QUADTREE` 则一分为八 |
 | `geometricError`    | 每个子瓦片的这个值是父瓦片的值的一半                         |
 
-> **代码实现注意事项**
->
-> 为了在分割空间的过程中保持浮点数值的稳定性，不应该算完子瓦片后再算孙子瓦片这样子依赖父地计算，而是应该根据具体等级瓦片等级的次幂，直接用根瓦片的对应值除以该次幂得到结果。
->
-> 不妨举例：令根瓦片的空间范围体某一个维度（譬如 x 轴），值域落在 [$min$, $max$]，对于某等级为 *level* 的瓦片，其在这个维度上应该被分成 $2^{level}$ 段，显然，这个等级的瓦片在该维度上的长度 $size = (max - min) / 2^{level}$；而在这个级别上的某个子瓦片的空间范围体，在这个维度上的最大最小值，可直接得到：$(min + size × i, min + size × (i + 1))$，其中，i是该子瓦片的索引（第几个, 0 < i < level, i是正整数）。
-
 至于 `boundingVolume` 和 `geometricError` 的计算是可以忽略的，因为 [3DTILES_metadata](./04-3DTILES_metadata.md) 扩展中有一种将元数据与隐式瓦片关联在一起的预设，即 [TILE_BOUNDING_BOX]() 和 [TILE_GEOMETRIC_ERROR]()，会直接作为隐式瓦片的 boundingVolume 和 geometricError。
+
+
+
+## 代码实现注意事项
+
+为了在分割空间的过程中保持浮点数值的稳定性，不应该算完子瓦片后再算孙子瓦片这样“子依赖父”地计算，而是应该根据具体等级瓦片等级的次幂，直接用根瓦片的对应值除以该次幂得到结果。
+
+不妨举例：
+
+令根瓦片的空间范围体某一个维度（譬如 x 轴），值域落在 [$min$, $max$]；
+
+对于某等级为 $level$ 的瓦片，其在这个维度上应该被分成 $2^{level}$ 段；
+
+显然，这个等级的瓦片在该维度上的长度 $size = (max - min) / 2^{level}$；
+
+而在这个级别上的某个子瓦片的空间范围体，在这个维度上的最大最小值，可直接得到：
+$$
+(min + size × i, min + size × (i + 1))
+$$
+其中，i是该子瓦片的索引（第几个, $0 < i < level$，i 是正整数）。
 
 
 
@@ -159,7 +173,7 @@ Tile.extension.3DTILES_implicit_tiling 对象，其属性规定如下：
 
 `x`、`y` 和 `z` 索引坐标则精准定位了该级别的瓦片。
 
-## ① 对于 box 类型的空间范围
+## 4.1. 对于 box 类型的空间范围
 
 | 坐标 | 正方向                  |
 | ---- | ----------------------- |
@@ -177,7 +191,7 @@ Tile.extension.3DTILES_implicit_tiling 对象，其属性规定如下：
 
 
 
-## ② 对于 region 类型的空间范围
+## 4.2. 对于 region 类型的空间范围
 
 | 坐标 | 正方向                       |
 | ---- | ---------------------------- |
@@ -199,7 +213,7 @@ Tile.extension.3DTILES_implicit_tiling 对象，其属性规定如下：
 
 举例说明：
 
-## ① 对于四叉树
+## 5.1. 对于四叉树
 
 模板 URI：`"content/{level}/{x}/{y}.pnts"`
 
@@ -211,7 +225,7 @@ content/1/1/0.pnts
 content/3/2/2.pnts
 ```
 
-## ② 对于八叉树
+## 5.2. 对于八叉树
 
 模板 URI：`"content/{level}/{x}/{y}/{z}.b3dm"`
 
@@ -259,7 +273,7 @@ content/3/2/1/0.b3dm
 
 
 
-## 可用性（Availability）
+## 6.1. 可用性（Availability）
 
 每个子树包含了瓦片的可用性（Tile Availability）、瓦片内容的可见性（Content Availability）和孩子子树的可用性（Child Subtree Availability）。
 
@@ -295,7 +309,7 @@ content/3/2/1/0.b3dm
 
 
 
-## 瓦片可用性（Tile Availability）
+## 6.2. 瓦片可用性（Tile Availability）
 
 瓦片可用性数据用来确定子树中存在哪些瓦片，遵守如下规则：
 
@@ -304,7 +318,7 @@ content/3/2/1/0.b3dm
 
 
 
-## 瓦片内容可用性（Content Availability）
+## 6.3. 瓦片内容可用性（Content Availability）
 
 瓦片内容可用性数据，用来指示瓦片是否有数据内容文件（即是不是非空瓦片）。`content.uri` 属性使用 [模板 URI](#5. 模板 URI) 来定位具体瓦片文件。
 
@@ -320,7 +334,7 @@ content/3/2/1/0.b3dm
 
 
 
-## 孩子子树可用性（Child Subtree Availability）
+## 6.4. 孩子子树可用性（Child Subtree Availability）
 
 孩子子树可用性数据指示了当前子树对象的最深层瓦片是否存在下一级子树的信息。这样，上层子树对象与这些“孩子子树”连在一起，以形成完整的 Tileset（瓦片数据集）。
 
@@ -371,7 +385,7 @@ JSON 块和二进制块必须使用字符零值、二进制零值填充至 8 字
 
 
 
-## buffer 与 bufferView
+## 7.1. buffer 与 bufferView
 
 buffer 就是一块二进制大对象。一个 buffer 可以是 subtree 文件中的一块，也可以讲额外的 buffer 存储到外部文件中，用 `buffer.uri` 属性引用。
 
@@ -432,16 +446,16 @@ buffer 除了存储子树对象的可用性数据外，还可以存储 [3DTILES_
 
 
 
-## 可用性数据的封装方式
+## 7.2. 可用性数据的封装方式
 
-参考 [3D元数据规范]() 中 Boolean 的格式说明。
+参考 [三维元数据规范（3D Metadata Specification）](https://github.com/CesiumGS/3d-tiles/tree/main/specification/Metadata) 中 Boolean 的格式说明。
 
 
 
 # 术语
 
 - availability（可用性） - 在某个子树中，瓦片/瓦片数据文件（内容）/孩子子树是否存在
-- bounding volume（空间范围体） - 包裹着瓦片或者瓦片数据的空间范围
+- bounding volume（空间范围长方体） - 包裹着瓦片或者瓦片数据的空间范围
 - child subtree（孩子子树）- 从某个子树最深层级的可用瓦片再向下延申的子树
 - content（内容）- 瓦片的数据内容，一般指 b3dm文件、pnts 文件等
 - implicit tiling（隐式瓦片分割）- 瓦片集对递归式分割的一种描述【译者注：约定式的一种对空间分割的方式，可不显式记录每个瓦片的空间范围，即隐式】
@@ -642,4 +656,8 @@ childTile.z = concatBits(parentTile.z, childZ)
 
 # 译者注
 
-隐式瓦片分割提出使用标准四叉树或者八叉树来分割某个区域，为了支持稀疏数据集，还特意提出了“子树”这个概念来聚合某些层级上的瓦片。子树中的数据结构仍然是四叉树或者八叉树，只不过它只关心少数的几层，对于超大规模的数据来说，配合它与它附带的可用性信息，可以极大优化加载过程、索引性能，做到使用类似 WMTS 一样的瓦片索引坐标进行瓦片随机访问，也便于瓦片空间信息的 RESTful 化。
+隐式瓦片扩展提出使用标准四叉树或者八叉树来“潜规则式”分割空间区域，并顺便创建空间瓦片的索引树。
+
+为了支持稀疏数据集，还特意提出了“子树”这个概念来聚合某些层级上的瓦片。
+
+子树中的数据结构仍然是四叉树或者八叉树，只不过它只关心少数的几层，对于超大规模的数据来说，配合它与它附带的可用性信息，可以极大优化加载过程、索引性能，做到使用类似 WMTS 一样的瓦片索引坐标进行瓦片随机访问，也便于瓦片空间信息的 RESTful 化。

@@ -406,7 +406,7 @@ S2 的单元（Cell）描述了地球椭球面上的一块四边形区域，记�
 }
 ```
 
-# JSON 格式规范
+# JSON 模式规范
 
 - [boundingVolume.3DTILES_bounding_volume_S2.schema.json](https://github.com/CesiumGS/3d-tiles/blob/main/extensions/3DTILES_bounding_volume_S2/schema/boundingVolume.3DTILES_bounding_volume_S2.schema.json)
 

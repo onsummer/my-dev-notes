@@ -206,7 +206,7 @@
 
 如上图所示，3DTILES_implicit_tiling 与 3DTILES_multiple_contents 组合使用。
 
-3DTILES_multiple_contents 中 content 的 uri 是模板，而 3DTILES_implicit_tiling 指定瓦片的空间分割结构是 QUADTREE（四叉树），对应瓦片的 subtree 文件的 uri 模板写在 subtrees.uri 属性。
+3DTILES_multiple_contents 中 content 的 uri 是模板，而 3DTILES_implicit_tiling 指定瓦片的空间分割（瓦片对象索引）结构是 QUADTREE（四叉树），对应瓦片的 subtree 文件的 uri 模板写在 subtrees.uri 属性。
 
 取一份 subtree 文件的 JSON 如下所示：
 
@@ -261,6 +261,8 @@
 ```
 
 在其 extensions.3DTILES_multiple_contents 对象中，`contentAvailability` 数组就记录了对应 content 的可用性信息（存储在 bufferView 对应的 buffer，详见 subtree 文件的规定与隐式瓦片分割的相关扩展项）。
+
+
 
 
 ## 2.3. 在隐式分割的瓦片中的元数据组

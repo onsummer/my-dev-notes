@@ -118,7 +118,7 @@ Tile.extension.3DTILES_implicit_tiling 对象，其属性规定如下：
 
 | 原 box                                                       | 四叉树分割后                                                 | 八叉树分割后                                                 |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| <img src="attachments/box.png" alt="Root box" style="zoom:33%;" /> | <img src="attachments/box-quadtree.png" alt="Box Quadtree" style="zoom:33%;" /> | <img src="https://github.com/CesiumGS/3d-tiles/raw/main/extensions/3DTILES_implicit_tiling/figures/box-octree.png" alt="Box octree" style="zoom:33%;" /> |
+| <img src="attachments/box.png" alt="Root box" style="zoom:33%;" /> | <img src="attachments/box-quadtree.png" alt="Box Quadtree" style="zoom:33%;" /> | <img src="attachments/box-octree.png" alt="Box octree" style="zoom:33%;" /> |
 
 - `region` 类型
 

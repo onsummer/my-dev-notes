@@ -1,3 +1,7 @@
+本文对应 [WGSL Spec 1. Introduction](https://www.w3.org/TR/WGSL/#intro)
+
+
+
 # 窥一斑
 
 WebGPU API 应用程序使用专有的着色器语言：WGSL。
@@ -26,4 +30,12 @@ WGSL 能写两种 GPU 指令，`DrawCommand` 和 `DispatchCommand`，即绘制�
 
 ## 概念细分：着色器与着色器语言
 
-todo
+**Shader**，着色器，是 WGSL 程序的组成部分。在管线中，它是一个着色阶段。
+
+着色器的构成如下：
+
+- 入口函数（Entry Point Function）
+- 以入口函数为起点所用到的所有作用域内的调用函数，包括用户自定义的和内置的
+- 上述函数静态访问的所有变量和常量
+- 用于定义上述变量或常量的类型、结构等
+

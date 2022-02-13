@@ -31,3 +31,11 @@ https://blog.csdn.net/qq_30621091/article/details/77897333
 通过 pipeline 传递 bindGroupLayout 对象，而 renderPassEncoder 传递 bindGroupLayout 对象。
 
 bindGroup 对象负责组织 ubo 和其它资源（texture 和 sampler 等）
+
+
+
+---
+
+本篇要讲讲 webgl 2.0 的 ubo，比对 webgpu 里的 uniformbuffer
+
+webgpu 的 uniformbuffer 的更新可以使用 queue.writeBuffer

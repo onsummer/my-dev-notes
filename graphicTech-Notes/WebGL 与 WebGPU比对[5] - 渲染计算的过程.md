@@ -11,3 +11,4 @@ WebGPU 可以先创建着色器模块对象，而不编译。
 着色器模块由 pipeline 使用，而 pipeline 最终由 renderPassEncoder 所设置，即 renderPassEncoder.setPipeline
 
 WebGL 中 pipeline 对应的对象是 WebGLProgram，每次切换就需要 gl.useProgram
+

@@ -22,10 +22,6 @@ typescript 4.5.2
 
 
 
-编辑切换为居中
-
-添加图片注释，不超过 140 字（可选）
-
 随后就可以轻松地获取 GPUDevice 了，只需两行代码（假如不检查错误情况）：
 
 ```
@@ -61,10 +57,6 @@ navigator.gpu.requestAdapter().then((adapter) => {
 
 
 
-编辑
-
-添加图片注释，不超过 140 字（可选）
-
 ## Top-level Await 不生效
 
 对于顶级 await 获取的方式貌似不可行，不知道是不是 deno 的问题。
@@ -80,6 +72,3 @@ console.log(device.limits)
 
 
 
-编辑
-
-添加图片注释，不超过 140 字（可选）

@@ -1,7 +1,26 @@
-渲染到纹理：colorAttachments COPY_DST textureView
+# 1. 综述
 
-渲染到一个特殊的容器 canvas（渲染的主战场）
+其实，写到第六篇比对基本上常规的 API 就差不多比对完了，但是有一个细节仍然值得我开一篇比对文章进行思考、记录，那就是渲染到何处。
+
+WebGL 的上下文对象是与 canvas 元素强关联的，没有 canvas 创建不了上下文，也就是说，WebGL 在设计之初就是拿来绘图的（的确如此），没考虑 GPU 的其它功能。
+
+WebGPU 则更强调“GPU”本身，它是需要自己制定绘制目标的，也就是通道编码器中设置的颜色附件关联的纹理对象。
+
+所以，WebGL 若不显式指定 Framebuffer，那默认就是画到 canvas 自己身上。
+
+本篇着重介绍 WebGPU 这一处新设计。有关 FBO 和 RBO 技术与 WebGPU 的差异我另有文章，请自行查阅。
 
 
 
-本篇主要讲 webgpu 的 canvas configure 机制，fbo 与离屏绘制技术、mrt 技术已经在 另一篇讲过不再展开
+# 3. WebGL 中的绘图区
+
+`gl.viewport()`
+
+页面变化时要修改
+
+
+
+# 2. WebGPU 中配置 canvas 的连接
+
+
+

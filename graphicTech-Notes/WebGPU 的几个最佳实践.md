@@ -112,7 +112,7 @@ WebGPU 支持至少 3 种压缩纹理类型：
 
 原作者写了个库，用于在 WebGL 和 WebGPU 种加载压缩纹理，参考 [Github toji/web-texture-tool](https://github.com/toji/web-texture-tool)
 
-WebGL 对压缩纹理的支持不太好，现在 WebGPU 原生就支持，所以尽可能用吧！
+WebGL 诞生之初对压缩纹理的支持不太好，以致于后来用 extension 的方式加载压缩纹理让开发者有点不好受。现在 WebGPU 原生就支持，所以 WebGPU 在这方面还是考虑了历史经验的。
 
 
 

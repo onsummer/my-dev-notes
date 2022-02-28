@@ -41,7 +41,7 @@ gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.RENDE
 
 实际上，在需要进行 MRT 时，`gl.COLOR_ATTACHMENT0`、`gl.COLOR_ATTACHMENT1` ... 这些属性只是一个数字，可以通过计算属性进行颜色附件的位置索引，也可以直接使用明确的数字代替：
 
-```
+```js
 console.log(gl.COLOR_ATTACHMENT0) // 36064
 console.log(gl.COLOR_ATTACHMENT1) // 36065
 

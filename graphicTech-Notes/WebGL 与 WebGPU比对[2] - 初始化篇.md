@@ -2,7 +2,7 @@
 
 ## 1.1 WebGL 获取上下文对象
 
-WebGL 获取的是 `WebGLRenderingContext/WebGLRenderingContext2` 对象，必须依赖于有合适宽度和高度的 `HTMLCanvasElement`，通常命名为 `gl`，gl 变量有非常多方法，允许修改 WebGL 的全局状态
+WebGL 获取的是 `WebGLRenderingContext/WebGL2RenderingContext` 对象，必须依赖于有合适宽度和高度的 `HTMLCanvasElement`，通常命名为 `gl`，gl 变量有非常多方法，允许修改 WebGL 的全局状态
 
 ``` js
 const gl = document.getElementById("id")?.getContext("webgl")

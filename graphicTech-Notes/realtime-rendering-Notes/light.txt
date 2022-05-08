@@ -1,0 +1,80 @@
+这应该是我第一次写下有关 RTR 中颜值相关的东西，也就是光照初步
+
+-- 点光（物理模型 灯泡）
+
+点光最基本属性
+
+``` glsl
+struct PointLight {
+  vec3 worldPostition;
+};
+```
+
+那就是点光的位置，通常使用 `点光坐标 - 表面点坐标` 这样向量相减，得到 `表面点到点光的方向向量`
+
+最后在片元着色器中把这个方向 点乘 表面点的法向量（都要规范化） ，得到光值。
+
+把光值乘上颜色值，即得到光照后的颜色值。
+
+辅助的值一般还有光的强度、颜色。
+
+
+-- 方向光（物理模型 太阳光）
+
+``` glsl
+struct DirectionLight {
+  vec3 direction;
+};
+```
+
+只有一个方向，只要 `表面点的方向` 和 `光的方向` 反向，即点积是 -1，说明光就对着表面，此时光照最强。
+
+越接近 1，说明面的朝向和光的方向就越同向，光照得越弱。
+
+辅助的值一般还有光的强度、颜色。
+
+
+-- 环境光（物理模型 光圈）
+
+``` glsl
+struct AmbientLight {
+  vec3 ambiengColor;
+};
+```
+
+环境光很简单，只是一个颜色值。
+
+辅助值是颜色的强度值。
+
+
+-- 聚光（物理模型 聚光灯）
+
+聚光是点光的“限定版”。首先，聚光灯要有一个中心射线方向，还要有一个“范围”。
+
+如何判断光线在光锥的内外？与中心射线方向点乘，得到的值与限定边界角的点乘值域比较即可。
+
+``` glsl
+struct SpotLight {
+  vec3 direction;
+  vec3 lightPosition;
+  vec2 limit;
+};
+```
+
+-- 光照模型
+
+http://www.yanhuangxueyuan.com/WebGL_course/light.html
+https://developer.mozilla.org/zh-CN/docs/Web/API/WebGL_API/Tutorial/Lighting_in_WebGL
+
+Lambert（漫反射）
+Phong（镜面反射）
+Blinn-Phong（修正镜面光）
+RenderingEquation（全局光照模型）
+
+
+PBR
+https://learnopengl-cn.github.io/07%20PBR/02%20Lighting/
+https://learnopengl-cn.github.io/07%20PBR/01%20Theory/
+https://blog.csdn.net/zwlstc/article/details/86620028
+
+

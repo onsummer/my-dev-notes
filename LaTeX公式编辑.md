@@ -2,8 +2,6 @@
 
 （和latex略兼容）
 
-
-
 # 1. 分式
 
 ```
@@ -17,11 +15,9 @@ $$
 
 ## 1.1. 行内空格
 
-``` 
+```
 \quad
 ```
-
-
 
 # 2. 矩阵和行列式
 
@@ -52,11 +48,9 @@ $\begin{pmatrix} 1&2 \\ 3&4 \end{pmatrix}$、$\begin{bmatrix} 1&2 \\ 3&4 \end{bm
 \begin{vmatrix} \end{vmatrix}  # 一竖行列式，两竖就大写V
 ```
 
-
-
 # 3. 函数
 
-``` 
+```
 \
 ```
 
@@ -80,7 +74,7 @@ $$
 e^x
 $$
 
-``` 
+```
 e_x 或 e_{x}
 ```
 
@@ -100,8 +94,6 @@ $$
 \sqrt[\frac{2}{3}]{b}
 $$
 
-
-
 # 4. 向量
 
 ```
@@ -112,11 +104,9 @@ $\vec{aaa}, \vec{AB}$
 
 三个字母就不太够了
 
-
-
 # 5. 方程组
 
-``` 
+```
 \begin{cases} \end{cases}
 # 每个方程之间的行间距 [<N>ex]，例如[2ex]
 # 每个方程换行 \\
@@ -153,7 +143,7 @@ $$
 
 ## 6.1. 长符号
 
-``` 
+```
 \overleftarrow{abc} 
 \overrightarrow{abc}
 ```
@@ -189,11 +179,9 @@ $\displaystyle \sum_{n=0}^\infty a_n$，$\displaystyle \Sigma_{n=0}^\infty a_n$
 
 累积用 \prod 或 \Pi
 
-
-
 ## 7.3. 极限
 
-``` 
+```
 \lim_{x \to 0}
 ```
 
@@ -203,7 +191,7 @@ $$
 
 # 8. 换行对齐
 
-``` 
+```
 \begin{align}
 f(x) & = ax+b \\
 & = b+ax \\
@@ -226,13 +214,9 @@ markdown 可以用\$$ 来触发，知乎用末尾双反斜杠
 a^2 = b^2 + c^2 \\
 ```
 
-
-
-
 $$
 a^2 = b^2 + c^2 \\
 $$
-
 
 # 参考
 
